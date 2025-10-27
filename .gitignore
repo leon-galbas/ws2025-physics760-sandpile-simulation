@@ -130,6 +130,7 @@ $RECYCLE.BIN/
 
 # Lock and temp files
 *.lock
+!uv.lock
 *.tmp
 *.swp
 *.swo
