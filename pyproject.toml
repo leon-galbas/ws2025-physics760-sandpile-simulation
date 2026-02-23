@@ -9,4 +9,7 @@ dependencies = [
     "matplotlib>=3.10.7",
     "numpy>=2.3.4",
     "scipy>=1.16.2",
+    "torch>=2.10.0",
+    "torchaudio>=2.10.0",
+    "torchvision>=0.25.0",
 ]
