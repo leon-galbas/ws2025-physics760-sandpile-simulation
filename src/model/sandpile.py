@@ -62,7 +62,7 @@ class SandpileModel:
         # start at time 0
         self.time = 0
         # historize average values of z
-        self.z_mean = torch.mean(self.z)
+        self.z_mean = torch.mean(self.z, dtype=torch.float)
         self.z_mean_timeseries = [self.z_mean]
 
     def step(self, t: int = 1):
@@ -74,7 +74,7 @@ class SandpileModel:
         for i in range(t):
             self.relax()
             self.perturb()
-            self.z_mean = torch.mean(self.z)
+            self.z_mean = torch.mean(self.z, dtype=torch.float)
             self.z_mean_timeseries.append(self.z_mean)
             self.time += 1
 
