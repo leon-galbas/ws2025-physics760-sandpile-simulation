@@ -5,15 +5,28 @@ import torch
 class SandpileModel:
     """A cellular automaton model for modeling sand piles.
 
-    The model is based on the following reference:
+    The model is based on the reference paper below.
+
+    Reference:
 
     Christensen, K., Fogedby, H. C., & Jeldtoft Jensen, H. (1991).
     Dynamical and spatial aspects of sandpile cellular automata.
     Journal of statistical physics, 63(3), 653-684.
     """
 
+    # class variables
     BOUNDARY_CONDITIONS = ["open", "closed"]
     PERTURBATIONS = ["conservative", "nonconservative"]
+
+    # class attributes
+    _N: int
+    _d: int
+    _z_c: int
+    _boundary_condition: str
+    _perturbation: str
+    z: torch.Tensor
+    t: int
+    _z_mean_timeseries: list[float]
 
     def __init__(
         self,
@@ -43,12 +56,14 @@ class SandpileModel:
             raise ValueError(
                 f"The given perturbation '{perturbation}' is not implemented. Valid values are {type(self).PERTURBATIONS}."
             )
+
         # init attributes
-        self.N = N
-        self.d = d
-        self.z_c = z_c
-        self.boundary_condition = boundary_condition
-        self.perturbation = perturbation
+        self._N = N
+        self._d = d
+        self._z_c = z_c
+        self._boundary_condition = boundary_condition
+        self._perturbation = perturbation
+
         # init z tensor
         z_shape = (N,) * d
         if z_init is not None:
@@ -56,14 +71,19 @@ class SandpileModel:
                 raise ValueError(
                     f"The shape {z_init.size()} of z_init does not match the shape {z_shape} given by arguments N and d!"
                 )
+            if z_init.dtype != torch.int:
+                raise TypeError(
+                    f"The given z_init is of dtype {z_init.dtype}. Must be of type 'torch.int'."
+                )
             self.z = z_init
         else:
             self.z = torch.zeros(z_shape, dtype=torch.int)
-        # start at time 0
+
+        # track time steps
         self.time = 0
+
         # historize average values of z
-        self.z_mean = torch.mean(self.z, dtype=torch.float)
-        self.z_mean_timeseries = [self.z_mean]
+        self._z_mean_timeseries = [self.z_mean]
 
     def step(self, t: int = 1):
         """Performs t unit time steps of the model temporary evolution.
@@ -74,32 +94,90 @@ class SandpileModel:
         for i in range(t):
             self.relax()
             self.perturb()
-            self.z_mean = torch.mean(self.z, dtype=torch.float)
-            self.z_mean_timeseries.append(self.z_mean)
+            self._z_mean_timeseries.append(self.z_mean)
             self.time += 1
 
     def relax(self):
-        # TODO
-        pass
+        """Performs the relaxation of z as described in the reference."""
+        # check for valid boundary condition
+        if self._boundary_condition not in type(self).BOUNDARY_CONDITIONS:
+            raise ValueError(
+                f"The perturbation {self._perturbation=} is not implemented!"
+            )
+
+        # perform relaxation steps until z(r) <= z_c everywhere
+        while True:
+            # Identify all unstable sites simultaneously
+            unstable_mask = self.z > self._z_c
+            if not unstable_mask.any():
+                break
+
+            # Cast to z's dtype to calculate sand transfer
+            firings = unstable_mask.to(self.z.dtype)
+
+            # Bulk relaxation step (Eq 4)
+            self.z -= 2 * self._d * firings
+
+            # Process dimensional shifts (nearest-neighbor transfers)
+            for dim in range(self._d):
+                # Slices for receiving from r - e_i (moving right/up)
+                idx_z_plus = [slice(None)] * self._d
+                idx_z_plus[dim] = slice(1, None)
+                idx_f_minus = [slice(None)] * self._d
+                idx_f_minus[dim] = slice(None, -1)
+
+                # Slices for receiving from r + e_i (moving left/down)
+                idx_z_minus = [slice(None)] * self._d
+                idx_z_minus[dim] = slice(None, -1)
+                idx_f_plus = [slice(None)] * self._d
+                idx_f_plus[dim] = slice(1, None)
+
+                # Add sand tumbling from adjacent sites
+                self.z[tuple(idx_z_plus)] += firings[tuple(idx_f_minus)]
+                self.z[tuple(idx_z_minus)] += firings[tuple(idx_f_plus)]
+
+                # Boundary Condition enforcement
+                if self._boundary_condition == "open":
+                    # Eq 5: Re-add 1 unit for each boundary at index N-1 where sand does not tumble outward
+                    idx_N = [slice(None)] * self._d
+                    idx_N[dim] = -1
+                    self.z[tuple(idx_N)] += firings[tuple(idx_N)]
+
+            # Zero-out specific boundaries after all transfers are computed
+            for dim in range(self._d):
+                # Both Open (Eq 5) and Closed (Eq 6) set z=0 at r_j = 0
+                idx_0 = [slice(None)] * self._d
+                idx_0[dim] = 0
+                self.z[tuple(idx_0)] = 0
+
+                # Closed (Eq 6) also sets z=0 at r_j = N
+                if self._boundary_condition == "closed":
+                    idx_N = [slice(None)] * self._d
+                    idx_N[dim] = -1
+                    self.z[tuple(idx_N)] = 0
 
     def perturb(self):
+        """Performs a perturbation of z as described in the reference."""
         # choose random lattice position
-        r = tuple(np.random.randint(0, self.N, size=self.d))
+        r = tuple(np.random.randint(0, self._N, size=self._d))
+
         # perform perturbation
-        match self.perturbation:
+        match self._perturbation:
             case "conservative":
-                self.z[r] += self.d
-                for i in range(self.d):
+                self.z[r] += self._d
+                for dim in range(self._d):
                     neighbor = list(r)
-                    if neighbor[i] >= 1:
-                        neighbor[i] -= 1
+                    if neighbor[dim] >= 1:
+                        neighbor[dim] -= 1
                         self.z[tuple(neighbor)] -= 1
             case "nonconservative":
                 self.z[r] += 1
             case _:
-                raise ValueError(f"The value {self.perturbation=} is not implemented!")
+                raise ValueError(
+                    f"The perturbation {self._perturbation=} is not implemented!"
+                )
 
-    def get_z_mean_timeseries(self) -> tuple[np.array, np.array]:
+    def z_mean_timeseries(self) -> tuple[np.ndarray, np.ndarray]:
         """Returns a timeseries of the models mean z values.
 
         The timeseries is returned as two separate numpy arrays.
@@ -109,5 +187,31 @@ class SandpileModel:
             tuple[np.array, np.array]: Timesteps, Mean z values.
         """
         ts = np.arange(0, self.time + 1)
-        z_means = np.array(self.z_mean_timeseries)
+        z_means = np.array(self._z_mean_timeseries)
         return ts, z_means
+
+    # ---------- GETTERS ----------
+
+    @property
+    def N(self) -> int:
+        return self._N
+
+    @property
+    def d(self) -> int:
+        return self._d
+
+    @property
+    def z_c(self) -> int:
+        return self._z_c
+
+    @property
+    def boundary_condition(self) -> str:
+        return self._boundary_condition
+
+    @property
+    def perturbation(self) -> str:
+        return self._perturbation
+
+    @property
+    def z_mean(self) -> float:
+        return float(torch.mean(self.z, dtype=torch.float))
