@@ -20,30 +20,7 @@ print(h_shape)
 h= torch.zeros(h_shape, device=device)
 z_shape = (N,) * d
 z = torch.zeros(z_shape, device=device) 
-def compute_slopes(h): 
-    diff_shape = (d,)+(N,) * d
-    diff = torch.zeros(diff_shape, device=device) 
-    for i in range(d): 
-        shape =[slice(1, N+1)] * d
-        shape[i]= slice(0, N)
-        h_a = h[i][shape]
-        h_b = h[i][(slice(1, N+1),) * d]
-        diff[i]= h_b-h_a
 
-    return diff.sum(dim=0)
-
-def update_heights(z,h): 
-    """
-    relaxation algorithm with open boundary conditions
-    """
-    Z= (z>z_c).to(torch.int64)
-    for i in range(d): 
-        shape =[slice(1, N+1)] * d
-        h[i][shape]= h[i][shape] - Z
-        shape[i]= slice(0, N)
-        h[i][shape]= h[i][shape] + Z 
-        
-    return h
 
 def relax(z,h): 
     """
@@ -51,7 +28,7 @@ def relax(z,h):
     """
     center_mask = (z > z_c).to(torch.int32)
     shape =[slice(0, N)] * d
-    adjacent_mask= torch.empty((N,) * d ,device=device)
+    adjacent_mask= torch.zeros((N,) * d ,device=device)
     for i in range(d): 
         shape_a = [slice(0, N)] * d
         shape_b = [slice(0, N)] * d
@@ -60,6 +37,10 @@ def relax(z,h):
         adjacent_mask[shape_a] += center_mask[shape_b]
         adjacent_mask[shape_b] += center_mask[shape_a]
     return z- 2 * d * center_mask + adjacent_mask
+
+
+
+
 means=[]
 T= 10000
 t1= time.clock_gettime(0)
@@ -106,3 +87,28 @@ def plot(h,z):
 
 
 plot(h,z)
+
+
+"""
+def compute_slopes(h): 
+    diff_shape = (d,)+(N,) * d
+    diff = torch.zeros(diff_shape, device=device) 
+    for i in range(d): 
+        shape =[slice(1, N+1)] * d
+        shape[i]= slice(0, N)
+        h_a = h[i][shape]
+        h_b = h[i][(slice(1, N+1),) * d]
+        diff[i]= h_b-h_a
+
+    return diff.sum(dim=0)
+
+def update_heights(z,h): 
+    Z= (z>z_c).to(torch.int64)
+    for i in range(d): 
+        shape =[slice(1, N+1)] * d
+        h[i][shape]= h[i][shape] - Z
+        shape[i]= slice(0, N)
+        h[i][shape]= h[i][shape] + Z 
+        
+    return h
+"""
