@@ -58,7 +58,7 @@ class SandpileModel:
                 )
             self.z = z_init
         else:
-            self.z = torch.zeros(z_shape)
+            self.z = torch.zeros(z_shape, dtype=torch.int)
         # start at time 0
         self.time = 0
         # historize average values of z
@@ -83,8 +83,21 @@ class SandpileModel:
         pass
 
     def perturb(self):
-        # TODO
-        pass
+        # choose random lattice position
+        r = tuple(np.random.randint(0, self.N, size=self.d))
+        # perform perturbation
+        match self.perturbation:
+            case "conservative":
+                self.z[r] += self.d
+                for i in range(self.d):
+                    neighbor = list(r)
+                    if neighbor[i] >= 1:
+                        neighbor[i] -= 1
+                        self.z[tuple(neighbor)] -= 1
+            case "nonconservative":
+                self.z[r] += 1
+            case _:
+                raise ValueError(f"The value {self.perturbation=} is not implemented!")
 
     def get_z_mean_timeseries(self) -> tuple[np.array, np.array]:
         """Returns a timeseries of the models mean z values.
