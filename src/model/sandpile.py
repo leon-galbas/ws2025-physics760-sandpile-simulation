@@ -240,15 +240,15 @@ class SandpileModel:
                     f"The perturbation {self._perturbation=} is not implemented!"
                 )
 
-    def save(self, name=None):
+    def save(self, filename=None):
         """Save the model to a file
 
         Args:
-            name (str, optional): Name of the model file. Defaults to timestamp.
+            name (str, optional): Name of the model file. Defaults to '<timestamp>.pkl'.
         """
         model_dir = read_config("model_dir")
-        if name is not None:
-            filepath = path.join(model_dir, f"{name}.pkl")
+        if filename is not None:
+            filepath = path.join(model_dir, f"{filename}")
         else:
             timestamp = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
             filepath = path.join(model_dir, f"{timestamp}.pkl")
