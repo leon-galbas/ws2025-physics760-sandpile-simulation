@@ -138,7 +138,6 @@ class SandpileModel:
                 idx_z_plus[dim] = slice(1, -1)
                 idx_f_minus = [slice(None)] * self._d
                 idx_f_minus[dim] = slice(None, -2)
-
                 # Slices for receiving from r + e_i (moving left/down)
                 idx_z_minus = [slice(None)] * self._d
                 idx_z_minus[dim] = slice(None, -1)
