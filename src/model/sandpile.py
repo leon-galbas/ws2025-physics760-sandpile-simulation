@@ -17,7 +17,6 @@ class SandpileModel:
     # class variables
     BOUNDARY_CONDITIONS = ["open", "closed"]
     PERTURBATIONS = ["conservative", "nonconservative"]
-
     # class attributes
     _N: int
     _d: int
@@ -27,7 +26,7 @@ class SandpileModel:
     z: torch.Tensor
     t: int
     _z_mean_timeseries: list[float]
-
+    boundary_mask: torch.Tensor
     def __init__(
         self,
         N: int,
@@ -84,7 +83,22 @@ class SandpileModel:
 
         # historize average values of z
         self._z_mean_timeseries = [self.z_mean]
+        
+        # init of boundary mask 
+        self.boundary_mask= torch.ones(z_shape)
+        for dim in range(self._d):
+            # Both Open (Eq 5) and Closed (Eq 6) set z=0 at r_j = 0
+            idx_0 = [slice(None)] * self._d
+            idx_0[dim] = 0
+            self.boundary_mask[tuple(idx_0)] = 0
 
+            # Closed (Eq 6) also sets z=0 at r_j = N
+            if self._boundary_condition == "closed":
+                idx_N = [slice(None)] * self._d
+                idx_N[dim] = -1
+                self.boundary_mask[tuple(idx_N)] = 0
+
+        print(self.boundary_mask)
     def step(self, t: int = 1):
         """Performs t unit time steps of the model temporary evolution.
 
@@ -96,7 +110,6 @@ class SandpileModel:
             self.perturb()
             self._z_mean_timeseries.append(self.z_mean)
             self.time += 1
-
     def relax(self):
         """Performs the relaxation of z as described in the reference."""
         # check for valid boundary condition
@@ -122,9 +135,9 @@ class SandpileModel:
             for dim in range(self._d):
                 # Slices for receiving from r - e_i (moving right/up)
                 idx_z_plus = [slice(None)] * self._d
-                idx_z_plus[dim] = slice(1, None)
+                idx_z_plus[dim] = slice(1, -1)
                 idx_f_minus = [slice(None)] * self._d
-                idx_f_minus[dim] = slice(None, -1)
+                idx_f_minus[dim] = slice(None, -2)
 
                 # Slices for receiving from r + e_i (moving left/down)
                 idx_z_minus = [slice(None)] * self._d
@@ -136,25 +149,8 @@ class SandpileModel:
                 self.z[tuple(idx_z_plus)] += firings[tuple(idx_f_minus)]
                 self.z[tuple(idx_z_minus)] += firings[tuple(idx_f_plus)]
 
-                # Boundary Condition enforcement
-                if self._boundary_condition == "open":
-                    # Eq 5: Re-add 1 unit for each boundary at index N-1 where sand does not tumble outward
-                    idx_N = [slice(None)] * self._d
-                    idx_N[dim] = -1
-                    self.z[tuple(idx_N)] += firings[tuple(idx_N)]
-
-            # Zero-out specific boundaries after all transfers are computed
-            for dim in range(self._d):
-                # Both Open (Eq 5) and Closed (Eq 6) set z=0 at r_j = 0
-                idx_0 = [slice(None)] * self._d
-                idx_0[dim] = 0
-                self.z[tuple(idx_0)] = 0
-
-                # Closed (Eq 6) also sets z=0 at r_j = N
-                if self._boundary_condition == "closed":
-                    idx_N = [slice(None)] * self._d
-                    idx_N[dim] = -1
-                    self.z[tuple(idx_N)] = 0
+                self.z= self.z*self.boundary_mask
+            
 
     def perturb(self):
         """Performs a perturbation of z as described in the reference."""
