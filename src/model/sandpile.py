@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import torch
 
 
@@ -17,16 +18,17 @@ class SandpileModel:
     # class variables
     BOUNDARY_CONDITIONS = ["open", "closed"]
     PERTURBATIONS = ["conservative", "nonconservative"]
-    # class attributes
+    # class attributes (constant)
     _N: int
     _d: int
     _z_c: int
     _boundary_condition: str
     _perturbation: str
-    z: torch.Tensor
-    t: int
-    _z_mean_timeseries: list[float]
     _boundary_mask: torch.Tensor
+    # class attributes (evolving)
+    z: torch.Tensor
+    _r_0: tuple
+    _data: pd.DataFrame
 
     # ---------- CONSTRUCTOR ----------
 
@@ -69,6 +71,7 @@ class SandpileModel:
         self._z_c = z_c
         self._boundary_condition = boundary_condition
         self._perturbation = perturbation
+        self._r_0 = None
 
         # init z tensor
         z_shape = (N,) * d
@@ -85,37 +88,73 @@ class SandpileModel:
         else:
             self.z = torch.zeros(z_shape, dtype=torch.int)
 
-        # track time steps
-        self.time = 0
-
-        # historize average values of z
-        self._z_mean_timeseries = [self.z_mean]
-
         # init of boundary mask
         self._boundary_mask = torch.empty(z_shape, dtype=self.z.dtype)
         self._update_boundary_mask()
 
+        # collect experiment data
+        data_schema = {
+            "macro_time": "int64",
+            "z_mean": "float64",
+            "s": "int64",
+            "t": "int64",
+            "l": "int64",
+        }
+        self._data = pd.DataFrame(
+            {col: pd.Series(dtype=dtype) for col, dtype in data_schema.items()}
+        )
+        self._data.loc[0] = 0
+
     # ---------- PUBLIC METHODS ----------
 
-    def step(self, t: int = 1):
-        """Performs t unit time steps of the model temporary evolution.
+    def step(self, steps: int = 1):
+        """Performs time steps of the models macroscopic temporary evolution.
+
+        One macroscopic time step corresponds to one full loop of Algorithm 1 in the
+        reference, i.e. one full relaxation and one perturbation.
 
         Args:
-            t (int, optional): Number of time steps. Defaults to 1.
+            steps (int, optional): Number of time steps. Defaults to 1.
         """
-        for i in range(t):
-            self.relax()
-            self.perturb()
-            self._z_mean_timeseries.append(self.z_mean)
-            self.time += 1
+        # track avalanche characteristics
+        s = np.empty(steps, dtype=int)
+        t = np.empty(steps, dtype=int)
+        l = np.empty(steps, dtype=int)  # noqa: E741
+        z_mean = np.empty(steps, dtype=int)
 
-    def relax(self):
+        # do macroscopic time steps
+        for i in range(steps):
+            s[i], t[i], l[i] = self.relax()  # noqa: E741
+            self.perturb()
+            z_mean[i] = self.z_mean
+
+        # save avalanche data
+        start_time = self.macro_time + 1
+        macro_time = np.arange(start_time, start_time + steps)
+        new_df = pd.DataFrame(
+            {
+                "macro_time": macro_time,
+                "z_mean": z_mean,
+                "s": s,
+                "t": t,
+                "l": l,
+            }
+        )
+        self._data = pd.concat([self._data, new_df])
+
+    def relax(self) -> tuple[int, int, int]:
         """Performs the relaxation of z as described in the reference."""
         # check for valid boundary condition
         if self._boundary_condition not in type(self).BOUNDARY_CONDITIONS:
             raise ValueError(
                 f"The perturbation {self._perturbation=} is not implemented!"
             )
+
+        # track avalanche parameters
+        total_dissipation_s = 0
+        lifetime_t = 0
+        cumulative_toppled_mask = torch.zeros_like(self.z, dtype=torch.bool)
+        spatial_size_l = 0
 
         # perform relaxation steps until z(r) <= z_c everywhere
         while True:
@@ -126,6 +165,12 @@ class SandpileModel:
 
             # Cast to z's dtype to calculate sand transfer
             firings = unstable_mask.to(self.z.dtype)
+
+            # Update avalanche parameters
+            f_alpha = firings.sum().item()
+            total_dissipation_s += f_alpha
+            lifetime_t += 1
+            cumulative_toppled_mask |= unstable_mask
 
             # Process dimensional shifts (nearest-neighbor transfers)
             for dim in range(self._d):
@@ -146,10 +191,25 @@ class SandpileModel:
             # Enforce boundary condition
             self.z.mul_(self._boundary_mask)
 
+        # calculate spatial linear size l auf the avalanche
+        if total_dissipation_s > 0 and self._r_0 is not None:
+            # Get N-dimensional coordinates of all sites that toppled
+            toppled_coords = torch.nonzero(cumulative_toppled_mask, as_tuple=False)
+            r_0_tensor = torch.tensor(self._r_0)
+
+            # Calculate maximum coordinate distance from r_0
+            max_distances_per_dim = torch.max(
+                torch.abs(toppled_coords - r_0_tensor), dim=0
+            )[0]
+            spatial_size_l = torch.max(max_distances_per_dim).item()
+
+        return total_dissipation_s, lifetime_t, spatial_size_l
+
     def perturb(self):
         """Performs a perturbation of z as described in the reference."""
         # choose random lattice position
         r = tuple(np.random.randint(0, self._N, size=self._d))
+        self._r_0 = r
 
         # perform perturbation
         match self._perturbation:
@@ -166,19 +226,6 @@ class SandpileModel:
                 raise ValueError(
                     f"The perturbation {self._perturbation=} is not implemented!"
                 )
-
-    def z_mean_timeseries(self) -> tuple[np.ndarray, np.ndarray]:
-        """Returns a timeseries of the models mean z values.
-
-        The timeseries is returned as two separate numpy arrays.
-        The first array are the time steps, the second are the z_mean values.
-
-        Returns:
-            tuple[np.array, np.array]: Timesteps, Mean z values.
-        """
-        ts = np.arange(0, self.time + 1)
-        z_means = np.array(self._z_mean_timeseries)
-        return ts, z_means
 
     # ---------- PRIVATE METHODS ----------
 
@@ -232,5 +279,17 @@ class SandpileModel:
         return self._perturbation
 
     @property
+    def r_0(self) -> tuple:
+        return self._r_0
+
+    @property
     def z_mean(self) -> float:
         return float(torch.mean(self.z, dtype=torch.float))
+
+    @property
+    def macro_time(self) -> int:
+        return self._data["macro_time"].max()
+
+    @property
+    def data(self) -> pd.DataFrame:
+        return self._data
