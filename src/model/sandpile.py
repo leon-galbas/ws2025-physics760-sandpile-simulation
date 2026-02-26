@@ -27,6 +27,7 @@ class SandpileModel:
     t: int
     _z_mean_timeseries: list[float]
     boundary_mask: torch.Tensor
+
     def __init__(
         self,
         N: int,
@@ -82,9 +83,9 @@ class SandpileModel:
 
         # historize average values of z
         self._z_mean_timeseries = [self.z_mean]
-        
-        # init of boundary mask 
-        self.boundary_mask= torch.ones(z_shape, dtype=self.z.dtype)
+
+        # init of boundary mask
+        self.boundary_mask = torch.ones(z_shape, dtype=self.z.dtype)
         for dim in range(self._d):
             # Both Open (Eq 5) and Closed (Eq 6) set z=0 at r_j = 0
             idx_0 = [slice(None)] * self._d
@@ -98,6 +99,7 @@ class SandpileModel:
                 self.boundary_mask[tuple(idx_N)] = 0
 
         print(self.boundary_mask)
+
     def step(self, t: int = 1):
         """Performs t unit time steps of the model temporary evolution.
 
@@ -105,12 +107,11 @@ class SandpileModel:
             t (int, optional): Number of time steps. Defaults to 1.
         """
         for i in range(t):
-            print(f"before: {self.z}")
-            self.relax()#
-            print(f"after: {self.z}")
+            self.relax()
             self.perturb()
             self._z_mean_timeseries.append(self.z_mean)
             self.time += 1
+
     def relax(self):
         """Performs the relaxation of z as described in the reference."""
         # check for valid boundary condition
@@ -128,7 +129,7 @@ class SandpileModel:
 
             # Cast to z's dtype to calculate sand transfer
             firings = unstable_mask.to(self.z.dtype)
-            
+
             # Process dimensional shifts (nearest-neighbor transfers)
             for dim in range(self._d):
                 # Slices for receiving from r +- e_i
@@ -137,15 +138,16 @@ class SandpileModel:
                 idx_minus = [slice(None)] * self._d
                 idx_minus[dim] = slice(None, -1)
 
-
                 # Add sand tumbling from adjacent sites and subtract from centers
-                self.z[tuple(idx_plus)] += firings[tuple(idx_minus)]-firings[tuple(idx_plus)]
-                self.z[tuple(idx_minus)] += firings[tuple(idx_plus)]-firings[tuple(idx_minus)]
-                
+                self.z[tuple(idx_plus)] += (
+                    firings[tuple(idx_minus)] - firings[tuple(idx_plus)]
+                )
+                self.z[tuple(idx_minus)] += (
+                    firings[tuple(idx_plus)] - firings[tuple(idx_minus)]
+                )
 
-            # Enforce boundary condition     
+            # Enforce boundary condition
             self.z.mul_(self.boundary_mask)
-            
 
     def perturb(self):
         """Performs a perturbation of z as described in the reference."""
