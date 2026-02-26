@@ -35,7 +35,7 @@ def compute_scaling_exponents(data: pd.DataFrame):
 def get_prob_exponent(x: np.ndarray) -> tuple[float, float]:
     """Calculate probability density scaling exponent.
 
-    This assumes that P(X=x) = x^(1-a). To obtain a, the function fits log(P(X=x))
+    This assumes that P(X=x) ~ x^(1-a). To obtain a, the function fits log(P(X=x))
     against log(x) linearly and returns a = 1-slope and its error.
 
     Args:
@@ -65,9 +65,24 @@ def get_prob_exponent(x: np.ndarray) -> tuple[float, float]:
 
 
 def get_cond_exponent(x: np.ndarray, y: np.ndarray) -> tuple[float, float]:
+    """Calculate conditional expectation value scaling exponents.
+
+    This assumes that E[Y|X=x] ~ x^a. To obtain a, the function fits log(E[Y|X=x])
+    against log(x) linearly and returns a = slope and its error.
+
+    Args:
+        x (np.ndarray): Array of x values.
+        y (np.ndarray): Array of y values.
+
+    Returns:
+        float: Estimated exponent.
+        float: Exponent error.
+    """
+    # Do weighted bincount
     sums = np.bincount(x, weights=y)
     counts = np.bincount(x)
 
+    # Compute conditional expectation values
     valid = counts > 0
     unique_x = np.arange(len(counts))[valid]
     cond_exp_y = sums[valid] / counts[valid]
