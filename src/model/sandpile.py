@@ -6,6 +6,7 @@ from os import path
 import numpy as np
 import pandas as pd
 import torch
+from tqdm import tqdm
 
 from src.utils import read_config
 
@@ -130,10 +131,12 @@ class SandpileModel:
         z_mean = np.empty(steps, dtype=int)
 
         # do macroscopic time steps
-        for i in range(steps):
+        logging.info(f"Performing {steps} time steps of the model...")
+        for i in tqdm(range(steps)):
             s[i], t[i], l[i] = self.relax()  # noqa: E741
             self.perturb()
             z_mean[i] = self.z_mean
+        logging.info("Done!")
 
         # save avalanche data
         start_time = self.macro_time + 1
