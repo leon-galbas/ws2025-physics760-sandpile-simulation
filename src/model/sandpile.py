@@ -86,7 +86,7 @@ class SandpileModel:
         self._z_mean_timeseries = [self.z_mean]
         
         # init of boundary mask 
-        self.boundary_mask= torch.ones(z_shape)
+        self.boundary_mask= torch.ones(z_shape, dtype=self.z.dtype)
         for dim in range(self._d):
             # Both Open (Eq 5) and Closed (Eq 6) set z=0 at r_j = 0
             idx_0 = [slice(None)] * self._d
@@ -107,9 +107,7 @@ class SandpileModel:
             t (int, optional): Number of time steps. Defaults to 1.
         """
         for i in range(t):
-            print(f"before: {self.z}")
             self.relax()
-            print(f"after: {self.z}")
             self.perturb()
             self._z_mean_timeseries.append(self.z_mean)
             self.time += 1
@@ -152,7 +150,7 @@ class SandpileModel:
                 self.z[tuple(idx_z_plus)] += firings[tuple(idx_f_minus)]
                 self.z[tuple(idx_z_minus)] += firings[tuple(idx_f_plus)]
             # Enforce boundary condition     
-            self.z= self.z*self.boundary_mask
+            self.z.mul_(self.boundary_mask)
             
 
     def perturb(self):
