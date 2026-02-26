@@ -44,7 +44,7 @@ class SandpileModel:
         self,
         N: int,
         d: int,
-        z_c: int,
+        z_c: int = None,
         boundary_condition: str = "open",
         perturbation: str = "conservative",
         z_init: torch.Tensor = None,
@@ -54,7 +54,7 @@ class SandpileModel:
         Args:
             N (int): The lattice size in each dimension.
             d (int): The lattice dimension.
-            z_c (int): The critical slope.
+            z_c (int, optional): The critical slope. Defaults to 2d-1.
             boundary_condition (str, optional): Boundary Condition. Defaults to "open".
             perturbation (str, optional): Perturbation type. Defaults to "conservative".
             z_init (torch.Tensor, optional): Initial slope values. Defaults to None.
@@ -76,7 +76,10 @@ class SandpileModel:
         # init attributes
         self._N = N
         self._d = d
-        self._z_c = z_c
+        if z_c is not None:
+            self._z_c = z_c
+        else:
+            self._z_c = 2 * d - 1
         self._boundary_condition = boundary_condition
         self._perturbation = perturbation
         self._r_0 = None
