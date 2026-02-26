@@ -150,7 +150,7 @@ class SandpileModel:
     def perturb(self):
         """Performs a perturbation of z as described in the reference."""
         # choose random lattice position
-        r = (4,5) #tuple(np.random.randint(0, self._N, size=self._d))
+        r = tuple(np.random.randint(0, self._N, size=self._d))
 
         # perform perturbation
         match self._perturbation:
