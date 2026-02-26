@@ -6,9 +6,9 @@ import sys
 sys.path.append(r'./src/model/')
 from sandpile import SandpileModel
 
-s= SandpileModel(6,2,4,boundary_condition="closed",perturbation="nonconservative")
+s= SandpileModel(6,2,4,boundary_condition="open",perturbation="nonconservative")
 
-T=1000
+T=10
 s.step(T)
 plt.plot(range(T+1), s.z_mean_timeseries()[1])
 plt.show()
