@@ -1,6 +1,13 @@
+import logging
+import pickle
+from datetime import datetime
+from os import path
+
 import numpy as np
 import pandas as pd
 import torch
+
+from src.utils import read_config
 
 
 class SandpileModel:
@@ -143,7 +150,13 @@ class SandpileModel:
         self._data = pd.concat([self._data, new_df])
 
     def relax(self) -> tuple[int, int, int]:
-        """Performs the relaxation of z as described in the reference."""
+        """Performs the relaxation of z as described in the reference.
+
+        Returns:
+            int: Total dissipation s of the avalanche.
+            int: Lifetime t of the avalanche.
+            int: Spatial linear size l of the avalanche.
+        """
         # check for valid boundary condition
         if self._boundary_condition not in type(self).BOUNDARY_CONDITIONS:
             raise ValueError(
@@ -226,6 +239,22 @@ class SandpileModel:
                 raise ValueError(
                     f"The perturbation {self._perturbation=} is not implemented!"
                 )
+
+    def save(self, name=None):
+        """Save the model to a file
+
+        Args:
+            name (str, optional): Name of the model file. Defaults to timestamp.
+        """
+        model_dir = read_config("model_dir")
+        if name is not None:
+            filepath = path.join(model_dir, f"{name}.pkl")
+        else:
+            timestamp = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+            filepath = path.join(model_dir, f"{timestamp}.pkl")
+        with open(filepath, "wb") as f:
+            pickle.dump(self, f)
+        logging.info(f"Model saved to '{filepath}'.")
 
     # ---------- PRIVATE METHODS ----------
 
