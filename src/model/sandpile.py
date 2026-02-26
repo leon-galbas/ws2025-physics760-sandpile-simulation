@@ -70,11 +70,11 @@ class SandpileModel:
                 raise ValueError(
                     f"The shape {z_init.size()} of z_init does not match the shape {z_shape} given by arguments N and d!"
                 )
-            if z_init.dtype != torch.int:
+            if z_init.dtype not in [torch.int32, torch.int64]:
                 raise TypeError(
-                    f"The given z_init is of dtype {z_init.dtype}. Must be of type 'torch.int'."
+                    f"The given z_init is of dtype {z_init.dtype}. Must be of type 'torch.int32' or 'torch.int64'."
                 )
-            self.z = z_init
+            self.z = z_init.clone()
         else:
             self.z = torch.zeros(z_shape, dtype=torch.int)
 
@@ -97,8 +97,6 @@ class SandpileModel:
                 idx_N = [slice(None)] * self._d
                 idx_N[dim] = -1
                 self.boundary_mask[tuple(idx_N)] = 0
-
-        print(self.boundary_mask)
 
     def step(self, t: int = 1):
         """Performs t unit time steps of the model temporary evolution.
