@@ -105,9 +105,7 @@ class SandpileModel:
             t (int, optional): Number of time steps. Defaults to 1.
         """
         for i in range(t):
-            print(f"before: {self.z}")
             self.relax()#
-            print(f"after: {self.z}")
             self.perturb()
             self._z_mean_timeseries.append(self.z_mean)
             self.time += 1
