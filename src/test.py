@@ -6,7 +6,7 @@ import sys
 sys.path.append(r'./src/model/')
 from sandpile import SandpileModel
 
-s= SandpileModel(6,2,4,boundary_condition="open",perturbation="nonconservative")
+s= SandpileModel(6,2,4,boundary_condition="closed",perturbation="nonconservative")
 
 T=1000
 s.step(T)

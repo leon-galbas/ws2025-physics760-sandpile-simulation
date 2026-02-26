@@ -27,6 +27,7 @@ class SandpileModel:
     t: int
     _z_mean_timeseries: list[float]
     boundary_mask: torch.Tensor
+    boundary_value: int
     def __init__(
         self,
         N: int,
@@ -62,7 +63,7 @@ class SandpileModel:
         self._z_c = z_c
         self._boundary_condition = boundary_condition
         self._perturbation = perturbation
-
+        self.boundary_value =  int(boundary_condition == "open")
         # init z tensor
         z_shape = (N,) * d
         if z_init is not None:
@@ -106,7 +107,9 @@ class SandpileModel:
             t (int, optional): Number of time steps. Defaults to 1.
         """
         for i in range(t):
+            print(f"before: {self.z}")
             self.relax()
+            print(f"after: {self.z}")
             self.perturb()
             self._z_mean_timeseries.append(self.z_mean)
             self.time += 1
@@ -134,10 +137,11 @@ class SandpileModel:
             # Process dimensional shifts (nearest-neighbor transfers)
             for dim in range(self._d):
                 # Slices for receiving from r - e_i (moving right/up)
+                # Index of -2 and -1 enforce open boundary condition
                 idx_z_plus = [slice(None)] * self._d
-                idx_z_plus[dim] = slice(1, -1)
+                idx_z_plus[dim] = slice(1, self.N-self.boundary_value)
                 idx_f_minus = [slice(None)] * self._d
-                idx_f_minus[dim] = slice(None, -2)
+                idx_f_minus[dim] = slice(None, -1-self.boundary_value)
                 # Slices for receiving from r + e_i (moving left/down)
                 idx_z_minus = [slice(None)] * self._d
                 idx_z_minus[dim] = slice(None, -1)
@@ -147,8 +151,8 @@ class SandpileModel:
                 # Add sand tumbling from adjacent sites
                 self.z[tuple(idx_z_plus)] += firings[tuple(idx_f_minus)]
                 self.z[tuple(idx_z_minus)] += firings[tuple(idx_f_plus)]
-
-                self.z= self.z*self.boundary_mask
+            # Enforce boundary condition     
+            self.z= self.z*self.boundary_mask
             
 
     def perturb(self):
