@@ -26,7 +26,10 @@ class SandpileModel:
     z: torch.Tensor
     t: int
     _z_mean_timeseries: list[float]
-    boundary_mask: torch.Tensor
+    _boundary_mask: torch.Tensor
+
+    # ---------- CONSTRUCTOR ----------
+
     def __init__(
         self,
         N: int,
@@ -47,6 +50,10 @@ class SandpileModel:
             z_init (torch.Tensor, optional): Initial slope values. Defaults to None.
         """
         # check values
+        if type(N) is not int or N <= 0:
+            raise ValueError("N must be >0 and of type 'int'.")
+        if type(d) is not int or d <= 0:
+            raise ValueError("d must be >0 and of type 'int'.")
         if boundary_condition not in type(self).BOUNDARY_CONDITIONS:
             raise ValueError(
                 f"The given boundary_condition '{boundary_condition}' is not implemented. Valid values are {type(self).BOUNDARY_CONDITIONS}."
@@ -62,6 +69,7 @@ class SandpileModel:
         self._z_c = z_c
         self._boundary_condition = boundary_condition
         self._perturbation = perturbation
+
         # init z tensor
         z_shape = (N,) * d
         if z_init is not None:
@@ -69,11 +77,11 @@ class SandpileModel:
                 raise ValueError(
                     f"The shape {z_init.size()} of z_init does not match the shape {z_shape} given by arguments N and d!"
                 )
-            if z_init.dtype != torch.int:
+            if z_init.dtype not in [torch.int32, torch.int64]:
                 raise TypeError(
-                    f"The given z_init is of dtype {z_init.dtype}. Must be of type 'torch.int'."
+                    f"The given z_init is of dtype {z_init.dtype}. Must be of type 'torch.int32' or 'torch.int64'."
                 )
-            self.z = z_init
+            self.z = z_init.clone()
         else:
             self.z = torch.zeros(z_shape, dtype=torch.int)
 
@@ -82,22 +90,13 @@ class SandpileModel:
 
         # historize average values of z
         self._z_mean_timeseries = [self.z_mean]
-        
-        # init of boundary mask 
-        self.boundary_mask= torch.ones(z_shape, dtype=self.z.dtype)
-        for dim in range(self._d):
-            # Both Open (Eq 5) and Closed (Eq 6) set z=0 at r_j = 0
-            idx_0 = [slice(None)] * self._d
-            idx_0[dim] = 0
-            self.boundary_mask[tuple(idx_0)] = 0
 
-            # Closed (Eq 6) also sets z=0 at r_j = N
-            if self._boundary_condition == "closed":
-                idx_N = [slice(None)] * self._d
-                idx_N[dim] = -1
-                self.boundary_mask[tuple(idx_N)] = 0
+        # init of boundary mask
+        self._boundary_mask = torch.empty(z_shape, dtype=self.z.dtype)
+        self._update_boundary_mask()
 
-        print(self.boundary_mask)
+    # ---------- PUBLIC METHODS ----------
+
     def step(self, t: int = 1):
         """Performs t unit time steps of the model temporary evolution.
 
@@ -105,10 +104,11 @@ class SandpileModel:
             t (int, optional): Number of time steps. Defaults to 1.
         """
         for i in range(t):
-            self.relax()#
+            self.relax()
             self.perturb()
             self._z_mean_timeseries.append(self.z_mean)
             self.time += 1
+
     def relax(self):
         """Performs the relaxation of z as described in the reference."""
         # check for valid boundary condition
@@ -126,7 +126,7 @@ class SandpileModel:
 
             # Cast to z's dtype to calculate sand transfer
             firings = unstable_mask.to(self.z.dtype)
-            
+
             # Process dimensional shifts (nearest-neighbor transfers)
             for dim in range(self._d):
                 # Slices for receiving from r +- e_i
@@ -135,15 +135,16 @@ class SandpileModel:
                 idx_minus = [slice(None)] * self._d
                 idx_minus[dim] = slice(None, -1)
 
-
                 # Add sand tumbling from adjacent sites and subtract from centers
-                self.z[tuple(idx_plus)] += firings[tuple(idx_minus)]-firings[tuple(idx_plus)]
-                self.z[tuple(idx_minus)] += firings[tuple(idx_plus)]-firings[tuple(idx_minus)]
-                
+                self.z[tuple(idx_plus)] += (
+                    firings[tuple(idx_minus)] - firings[tuple(idx_plus)]
+                )
+                self.z[tuple(idx_minus)] += (
+                    firings[tuple(idx_plus)] - firings[tuple(idx_minus)]
+                )
 
-            # Enforce boundary condition     
-            self.z.mul_(self.boundary_mask)
-            
+            # Enforce boundary condition
+            self.z.mul_(self._boundary_mask)
 
     def perturb(self):
         """Performs a perturbation of z as described in the reference."""
@@ -179,7 +180,24 @@ class SandpileModel:
         z_means = np.array(self._z_mean_timeseries)
         return ts, z_means
 
-    # ---------- GETTERS ----------
+    # ---------- PRIVATE METHODS ----------
+
+    def _update_boundary_mask(self):
+        """Calculates the boundary mask used to enforce boundary conditions during relaxation."""
+        self._boundary_mask = torch.ones(self.z.size(), dtype=self.z.dtype)
+        for dim in range(self._d):
+            # Both Open (Eq 5) and Closed (Eq 6) set z=0 at r_j = 0
+            idx_0 = [slice(None)] * self._d
+            idx_0[dim] = 0
+            self._boundary_mask[tuple(idx_0)] = 0
+
+            # Closed (Eq 6) also sets z=0 at r_j = N
+            if self._boundary_condition == "closed":
+                idx_N = [slice(None)] * self._d
+                idx_N[dim] = -1
+                self._boundary_mask[tuple(idx_N)] = 0
+
+    # ---------- GETTERS/SETTERS ----------
 
     @property
     def N(self) -> int:
@@ -196,6 +214,18 @@ class SandpileModel:
     @property
     def boundary_condition(self) -> str:
         return self._boundary_condition
+
+    @boundary_condition.setter
+    def boundary_condition(self, new_condition):
+        # check value
+        if new_condition not in type(self).BOUNDARY_CONDITIONS:
+            raise ValueError(
+                f"The given boundary_condition '{new_condition}' is not implemented. Valid values are {type(self).BOUNDARY_CONDITIONS}."
+            )
+
+        # update boundary condition and boundary mask
+        self._boundary_condition = new_condition
+        self._update_boundary_mask()
 
     @property
     def perturbation(self) -> str:
