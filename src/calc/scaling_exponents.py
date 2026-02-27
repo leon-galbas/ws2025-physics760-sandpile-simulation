@@ -9,7 +9,7 @@ def compute_scaling_exponents(data: pd.DataFrame):
 
     s = np.asarray(data["s"], dtype=np.int64)
     t = np.asarray(data["s"], dtype=np.int64)
-    l = np.asarray(data["s"], dtype=np.int64)
+    l = np.asarray(data["s"], dtype=np.int64)  # noqa: E741
     exponents = {}
     logging.info("Calculating scaling exponents.")
 

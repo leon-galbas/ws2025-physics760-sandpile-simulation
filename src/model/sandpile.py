@@ -1,11 +1,13 @@
 import logging
 import pickle
+from collections import deque
 from datetime import datetime
 from os import path
 
 import numpy as np
 import pandas as pd
 import torch
+from scipy.stats import linregress
 from tqdm import tqdm
 
 from src.utils import read_config
@@ -37,6 +39,7 @@ class SandpileModel:
     z: torch.Tensor
     _r_0: tuple
     _data: pd.DataFrame
+    _macro_time: int
 
     # ---------- CONSTRUCTOR ----------
 
@@ -104,9 +107,8 @@ class SandpileModel:
         self._update_boundary_mask()
 
         # collect experiment data
+        self._macro_time = 0
         data_schema = {
-            "macro_time": "int64",
-            "z_mean": "float64",
             "s": "int64",
             "t": "int64",
             "l": "int64",
@@ -118,42 +120,126 @@ class SandpileModel:
 
     # ---------- PUBLIC METHODS ----------
 
-    def step(self, steps: int = 1):
-        """Performs time steps of the models macroscopic temporary evolution.
-
-        One macroscopic time step corresponds to one full loop of Algorithm 1 in the
-        reference, i.e. one full relaxation and one perturbation.
+    def burn_in(
+        self, window_size: int = 50, check_interval: int = 1000, epsilon: float = 1e-5
+    ):
+        """Executes a "burn-in" phase during which z_mean reaches a stationary state.
 
         Args:
-            steps (int, optional): Number of time steps. Defaults to 1.
+            window_size (int, optional): Number of samples in the rolling window.
+                Defaults to 50.
+            check_interval (int, optional): Intervals at which z_mean is computed.
+                Defaults to 1000.
+            epsilon (float, optional): Slope threshold for stationarity.
+                Defaults to 1e-5.
+        """
+        if self.boundary_condition == "closed" and self.perturbation == "conservative":
+            raise ValueError(
+                "A system with closed boundary conditions and conservative perturbation never reaches a stationary state ."
+            )
+
+        z_averages = deque(maxlen=window_size)
+        burn_in_steps = 0
+
+        logging.info("Start traversing towards stationary state...")
+        # Run model until z_mean reaches stationarity
+        while True:
+            _, _, _ = self.relax()
+            self.perturb()
+            burn_in_steps += 1
+
+            # Check stationarity at intervals to minimize overhead
+            if burn_in_steps % check_interval == 0:
+                z_averages.append(self.z_mean)
+
+                # Evaluate convergence if the rolling window is full
+                if len(z_averages) == window_size:
+                    x = np.arange(window_size)
+                    y = np.array(z_averages)
+                    fit = linregress(x, y)
+
+                    # Stop of z_mean slope is below threshold
+                    if abs(fit.slope) < epsilon:
+                        break
+
+        logging.info(f"Stationary state reached after {burn_in_steps} steps.")
+        self._macro_time += burn_in_steps
+
+    def measure(self, num_measurements: int):
+        """Performs measurements of avalanche metrics s, t, l.
+
+        Performs full loops of Algorithm 1 in the reference, i.e. relaxations and
+        perturbations. Whenever an avalanche event happens, the metrics
+        s (total dissipation), t (lifetime) and l (spatial linear size) are tracked.
+
+        Args:
+            num_measurements (int): Number of avalanche events to measure.
         """
         # track avalanche characteristics
-        s = np.empty(steps, dtype=int)
-        t = np.empty(steps, dtype=int)
-        l = np.empty(steps, dtype=int)  # noqa: E741
-        z_mean = np.empty(steps, dtype=int)
+        sizes = []
+        lifetimes = []
+        linear_sizes = []  # noqa: E741
 
         # do macroscopic time steps
-        logging.info(f"Performing {steps} time steps of the model...")
-        for i in tqdm(range(steps)):
-            s[i], t[i], l[i] = self.relax()  # noqa: E741
-            self.perturb()
-            z_mean[i] = self.z_mean
+        logging.info(f"Performing {num_measurements} measurements of the model...")
+        with tqdm(total=num_measurements) as pbar:
+            while len(sizes) < num_measurements:
+                s, t, l = self.relax()  # noqa: E741
+                self.perturb()
+                if s > 0:
+                    sizes.append(s)
+                    lifetimes.append(t)
+                    linear_sizes.append(l)
+                    pbar.update(1)
+                self._macro_time += 1
         logging.info("Done!")
 
         # save avalanche data
-        start_time = self.macro_time + 1
-        macro_time = np.arange(start_time, start_time + steps)
         new_df = pd.DataFrame(
             {
-                "macro_time": macro_time,
-                "z_mean": z_mean,
-                "s": s,
-                "t": t,
-                "l": l,
+                "s": sizes,
+                "t": lifetimes,
+                "l": linear_sizes,
             }
         )
         self._data = pd.concat([self._data, new_df])
+
+    # def step(self, steps: int = 1):
+    #     """Performs time steps of the models macroscopic temporary evolution.
+
+    #     One macroscopic time step corresponds to one full loop of Algorithm 1 in the
+    #     reference, i.e. one full relaxation and one perturbation.
+
+    #     Args:
+    #         steps (int, optional): Number of time steps. Defaults to 1.
+    #     """
+    #     # track avalanche characteristics
+    #     s = np.empty(steps, dtype=int)
+    #     t = np.empty(steps, dtype=int)
+    #     l = np.empty(steps, dtype=int)  # noqa: E741
+    #     z_mean = np.empty(steps, dtype=int)
+
+    #     # do macroscopic time steps
+    #     logging.info(f"Performing {steps} time steps of the model...")
+    #     for i in tqdm(range(steps)):
+    #         s[i], t[i], l[i] = self.relax()  # noqa: E741
+    #         self.perturb()
+    #         z_mean[i] = self.z_mean
+    #     logging.info("Done!")
+
+    #     # save avalanche data
+    #     start_time = self.macro_time + 1
+    #     macro_time = np.arange(start_time, start_time + steps)
+    #     new_df = pd.DataFrame(
+    #         {
+    #             "macro_time": macro_time,
+    #             "z_mean": z_mean,
+    #             "s": s,
+    #             "t": t,
+    #             "l": l,
+    #         }
+    #     )
+    #     self._data = pd.concat([self._data, new_df])
 
     def relax(self) -> tuple[int, int, int]:
         """Performs the relaxation of z as described in the reference.
@@ -322,8 +408,8 @@ class SandpileModel:
         return float(torch.mean(self.z, dtype=torch.float))
 
     @property
-    def macro_time(self) -> int:
-        return self._data["macro_time"].max()
+    def time(self) -> int:
+        return self._macro_time
 
     @property
     def data(self) -> pd.DataFrame:
