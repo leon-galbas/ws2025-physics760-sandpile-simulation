@@ -1,10 +1,6 @@
 import logging
 
-from src.calc.scaling_exponents import compute_scaling_exponents
-from src.model.sandpile import SandpileModel
-
-# from src.model.io import load_model
-
+from src.calc.simulation import run_simulation
 
 logging.basicConfig(
     level=logging.INFO,
@@ -14,23 +10,8 @@ logging.basicConfig(
 
 N = 40
 d = 2
+boundary_condition = "open"
+perturbation = "conservative"
+num_measurements = 1e6
 
-model = SandpileModel(N, d)
-model.burn_in()
-model.measure(num_measurements=1e6)
-model.save(f"N{N}d{d}.pkl")
-# model = load_model("100k_steps.pkl")
-df = model.data
-
-# plot
-# mask = df["t"] > 0
-# x = df["macro_time"]
-# x = x[mask]#
-# y = df["t"]
-# y = y[mask]
-
-# plt.plot(x, y)
-# plt.show()
-
-
-compute_scaling_exponents(data=df)
+run_simulation(N, d, boundary_condition, perturbation, num_measurements)

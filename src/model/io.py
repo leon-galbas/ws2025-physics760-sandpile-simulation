@@ -15,10 +15,28 @@ def load_model(filename: str) -> SandpileModel:
     Returns:
         SandpileModel: The loaded model.
     """
+    if not model_exists(filename):
+        raise FileNotFoundError(f"Model named '{filename}' does not exist!")
+
     model_dir = read_config("model_dir")
-    filepath = path.join(model_dir, f"{filename}")
+    filepath = path.join(model_dir, filename)
     with open(filepath, "rb") as f:
         model = pickle.load(f)
     logging.info(f"Model loaded from '{filepath}'.")
 
     return model
+
+
+def model_exists(filename: str) -> bool:
+    """Check if a saved model with the given filename exists.
+
+    Args:
+        filename (str): Model Filename.
+
+    Returns:
+        bool: Whether the model exists.
+    """
+    model_dir = read_config("model_dir")
+    filepath = path.join(model_dir, filename)
+
+    return path.exists(filepath)
