@@ -204,42 +204,49 @@ class SandpileModel:
         )
         self._data = pd.concat([self._data, new_df])
 
-    # def step(self, steps: int = 1):
-    #     """Performs time steps of the models macroscopic temporary evolution.
+    # DEPRECATED -> USE BURN IN AND MEASURE
+    def step(self, steps: int = 1):
+        """Performs time steps of the models macroscopic temporary evolution.
 
-    #     One macroscopic time step corresponds to one full loop of Algorithm 1 in the
-    #     reference, i.e. one full relaxation and one perturbation.
+        One macroscopic time step corresponds to one full loop of Algorithm 1 in the
+        reference, i.e. one full relaxation and one perturbation.
 
-    #     Args:
-    #         steps (int, optional): Number of time steps. Defaults to 1.
-    #     """
-    #     # track avalanche characteristics
-    #     s = np.empty(steps, dtype=int)
-    #     t = np.empty(steps, dtype=int)
-    #     l = np.empty(steps, dtype=int)  # noqa: E741
-    #     z_mean = np.empty(steps, dtype=int)
+        Args:
+            steps (int, optional): Number of time steps. Defaults to 1.
+        """
+        logging.warning(
+            "This method is deprecated. Use 'burn_in' and 'measure' to perform measurements!"
+        )
 
-    #     # do macroscopic time steps
-    #     logging.info(f"Performing {steps} time steps of the model...")
-    #     for i in tqdm(range(steps)):
-    #         s[i], t[i], l[i] = self.relax()  # noqa: E741
-    #         self.perturb()
-    #         z_mean[i] = self.z_mean
-    #     logging.info("Done!")
+        # track avalanche characteristics
+        s = np.empty(steps, dtype=int)
+        t = np.empty(steps, dtype=int)
+        l = np.empty(steps, dtype=int)  # noqa: E741
+        z_mean = np.empty(steps, dtype=int)
 
-    #     # save avalanche data
-    #     start_time = self.macro_time + 1
-    #     macro_time = np.arange(start_time, start_time + steps)
-    #     new_df = pd.DataFrame(
-    #         {
-    #             "macro_time": macro_time,
-    #             "z_mean": z_mean,
-    #             "s": s,
-    #             "t": t,
-    #             "l": l,
-    #         }
-    #     )
-    #     self._data = pd.concat([self._data, new_df])
+        # do macroscopic time steps
+        logging.info(f"Performing {steps} time steps of the model...")
+        for i in tqdm(range(steps)):
+            s[i], t[i], l[i] = self.relax()  # noqa: E741
+            self.perturb()
+            z_mean[i] = self.z_mean
+        logging.info("Done!")
+
+        # save avalanche data
+        start_time = self.time + 1
+        macro_time = np.arange(start_time, start_time + steps)
+        df = pd.DataFrame(
+            {
+                "macro_time": macro_time,
+                "z_mean": z_mean,
+                "s": s,
+                "t": t,
+                "l": l,
+            }
+        )
+        self._macro_time += steps
+
+        return df
 
     def relax(self) -> tuple[int, int, int]:
         """Performs the relaxation of z as described in the reference.
