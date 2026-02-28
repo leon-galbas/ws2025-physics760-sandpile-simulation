@@ -8,6 +8,8 @@ from src.model.sandpile import SandpileModel
 def run_simulation(
     N: int, d: int, boundary_condition: str, perturbation: str, num_measurements: int
 ):
+    # convert num_measurements to int
+    num_measurements = int(num_measurements)
     # get model with given hyperparameters
     logging.info(
         f"Running simulation with {N=}, {d=}, {boundary_condition=}, {perturbation=}, {num_measurements=}..."
