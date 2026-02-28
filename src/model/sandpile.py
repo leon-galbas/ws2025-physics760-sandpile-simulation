@@ -50,7 +50,7 @@ class SandpileModel:
         z_c: int = None,
         boundary_condition: str = "open",
         perturbation: str = "conservative",
-        z_init: torch.Tensor = None,
+        z_init: torch.Tensor | str = None,
     ):
         """Initializes the sandpile model.
 
@@ -123,7 +123,7 @@ class SandpileModel:
     # ---------- PUBLIC METHODS ----------
 
     def burn_in(
-        self, window_size: int = 50, check_interval: int = 1000, epsilon: float = 1e-5
+        self, window_size: int = 50, check_interval: int = 1000, epsilon: float = None
     ):
         """Executes a "burn-in" phase during which z_mean reaches a stationary state.
 
@@ -133,17 +133,23 @@ class SandpileModel:
             check_interval (int, optional): Intervals at which z_mean is computed.
                 Defaults to 1000.
             epsilon (float, optional): Slope threshold for stationarity.
-                Defaults to 1e-5.
         """
         if self.boundary_condition == "closed" and self.perturbation == "conservative":
             raise ValueError(
                 "A system with closed boundary conditions and conservative perturbation never reaches a stationary state ."
             )
 
+        # Compute epsilon
+        if epsilon is None:
+            k = 5
+            volume = np.pow(self.N, self.d)
+            sigma_m = np.sqrt(12.0 / (volume * np.pow(window_size, 3)))
+            epsilon = k * sigma_m
+
         z_averages = deque(maxlen=window_size)
         burn_in_steps = 0
 
-        logging.info("Start traversing towards stationary state...")
+        logging.info(f"Start traversing towards stationary state. Threshold {epsilon=}")
         # Run model until z_mean reaches stationarity
         while True:
             _, _, _ = self.relax()
