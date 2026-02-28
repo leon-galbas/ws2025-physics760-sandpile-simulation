@@ -36,15 +36,29 @@ runinaddress,
 \begin{document}
 
 \preprint{APS/123-QED}
-\include{01_title}
-\include{02_abstract}
+\input{01_title}
+\input{02_abstract}
 \maketitle
 
 %\tableofcontents
 
-\section{\label{sec:level1}First-level heading:\protect\\ The line
-break was forced \lowercase{via} \textbackslash\textbackslash}
+\section{Introduction \label{sec:intro}}
+\input{03_introduction}
 
+\section{Theoretical Basis \label{sec:theory}}
+\input{04_theory}
+
+\section{Methods \label{sec:methods}}
+\input{05_methods}
+
+\section{Results \label{sec:results}}
+\input{06_results}
+
+\section{Discussion \label{sec:discussion}}
+\input{07_discussion}
+
+\section{Summary \label{sec:summary}}
+\input{08_summary}
 
 
 \bibliography{apssamp}% Produces the bibliography via BibTeX.
