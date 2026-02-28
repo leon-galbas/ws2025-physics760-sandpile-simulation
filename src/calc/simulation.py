@@ -23,13 +23,19 @@ def run_simulation(
             logging.info(f"Performing missing {n=} measurements.")
             model.measure(num_measurements=n)
     else:
-        model = SandpileModel(N, d)
+        model = SandpileModel(
+            N,
+            d,
+            boundary_condition=boundary_condition,
+            perturbation=perturbation,
+            z_init="random",
+        )
         model.burn_in()
         model.measure(num_measurements=num_measurements)
         model.save(model_name)
 
     # compute scaling exponents
-    df = model.data
+    df = model.data[:num_measurements]
     exponents = compute_scaling_exponents(data=df)
 
     return exponents

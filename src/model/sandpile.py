@@ -50,17 +50,17 @@ class SandpileModel:
         z_c: int = None,
         boundary_condition: str = "open",
         perturbation: str = "conservative",
-        z_init: torch.Tensor | str = None,
+        z_init: torch.Tensor | int | str = None,
     ):
         """Initializes the sandpile model.
 
         Args:
             N (int): The lattice size in each dimension.
             d (int): The lattice dimension.
-            z_c (int, optional): The critical slope. Defaults to 2d-1.
+            z_c (int, optional): The critical threshold. Defaults to 2d-1.
             boundary_condition (str, optional): Boundary Condition. Defaults to "open".
             perturbation (str, optional): Perturbation type. Defaults to "conservative".
-            z_init (torch.Tensor, optional): Initial slope values. Defaults to None.
+            z_init (torch.Tensor, optional): Initial z tensor. Defaults to all zero.
         """
         # check values
         if type(N) is not int or N <= 0:
@@ -90,17 +90,42 @@ class SandpileModel:
         # init z tensor
         z_shape = (N,) * d
         if z_init is not None:
-            if z_init.size() != z_shape:
-                raise ValueError(
-                    f"The shape {z_init.size()} of z_init does not match the shape {z_shape} given by arguments N and d!"
-                )
-            if z_init.dtype not in [torch.int32, torch.int64]:
-                raise TypeError(
-                    f"The given z_init is of dtype {z_init.dtype}. Must be of type 'torch.int32' or 'torch.int64'."
-                )
-            self.z = z_init.clone()
+            # initialize z randomly close to critical threshold
+            if type(z_init) is str:
+                if z_init == "random":
+                    delta = 2
+                    self.z = torch.randint(
+                        self.z_c - delta,
+                        self.z_c + delta + 1,
+                        size=z_shape,
+                        dtype=torch.int64,
+                    )
+                else:
+                    raise ValueError(
+                        f"Invalid parameter {z_init=}. Did you mean z_init='random'?"
+                    )
+            # initialize z to a constant value
+            elif type(z_init) is int:
+                if z_init >= 0:
+                    self.z = z_init * torch.ones(z_shape, dtype=torch.int64)
+                else:
+                    raise ValueError(
+                        f"Invalid parameter {z_init=}. Values of z must be >= 0."
+                    )
+            # initialize z to custom tensor
+            elif type(z_init) is torch.Tensor:
+                if z_init.size() != z_shape:
+                    raise ValueError(
+                        f"The shape {z_init.size()} of z_init does not match the shape {z_shape} given by arguments N and d!"
+                    )
+                if z_init.dtype not in [torch.int32, torch.int64]:
+                    raise TypeError(
+                        f"The given z_init is of dtype {z_init.dtype}. Must be of type 'torch.int32' or 'torch.int64'."
+                    )
+                self.z = z_init.clone()
         else:
-            self.z = torch.zeros(z_shape, dtype=torch.int)
+            # initialize z to zero
+            self.z = torch.zeros(z_shape, dtype=torch.int64)
 
         # init of boundary mask
         self._boundary_mask = torch.empty(z_shape, dtype=self.z.dtype)
@@ -118,7 +143,7 @@ class SandpileModel:
         )
         self._data.loc[0] = 0
 
-        logging.info(f"SandpileModel initialized with {N=}, {d=}, z_c={self._z_c}.")
+        logging.info(f"SandpileModel initialized with {N=}, {d=}, z_c={self.z_c}.")
 
     # ---------- PUBLIC METHODS ----------
 
