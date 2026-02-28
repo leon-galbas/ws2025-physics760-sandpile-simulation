@@ -16,12 +16,12 @@
 \RequirePackage{physics}
 \RequirePackage{siunitx}
 \sisetup{
-    locale = DE,
+  locale = DE,
 	separate-uncertainty,
 	range-units = brackets,
 	list-units = brackets,
 	per-mode = symbol-or-fraction,
-    table-format=1.2,   % Adjust this based on expected number width
+  table-format=1.2,   % Adjust this based on expected number width
 }
 
 % FOR CODE
@@ -42,7 +42,7 @@
 %\RequirePackage{multicol}
 \RequirePackage{makecell}
 \RequirePackage{dcolumn} % Align table columns on decimal point}
-%Arithmetics 
+%Arithmetics
 \RequirePackage{fp}
 % FOR FORMATTING AND OTHER STUFF
 \RequirePackage{bbm}
@@ -67,7 +67,7 @@
 % Custom SI units
 \DeclareSIUnit\scale{Skt} % Skalenteile
 \DeclareSIUnit\pixel{px} % Pixel
-\DeclareSIUnit\dBm{dBm} 
+\DeclareSIUnit\dBm{dBm}
 
 % Some useful commands
 \renewcommand{\l}{\left}
@@ -79,7 +79,7 @@
 \newcommand{\eps}{\varepsilon}
 \newcommand{\zz}{\textnormal{Z\kern-.3em\raise-0.5ex\hbox{Z}:}}
 
-% single letters in different fonts 
+% single letters in different fonts
 
 %%%%%%%%%%%% mathematical bold  %%%%%%%%%%%%%%%%%%%%
 
@@ -219,7 +219,7 @@
     X% fallback for unknown L
   \fi
 }
-% Writes number as fraction or integer 
+% Writes number as fraction or integer
 \newcommand{\FmtF}[1]{%
   \FPifint{#1}%
     % F is integer
