@@ -23,7 +23,7 @@ hyperparameters = dict(
     perturbations=["conservative", "nonconservative"],
 )
 
-n_measure = 5e5
+n_measure = 1000  # 5e5
 outpath = path.join(read_config("data_dir"), "scaling_coefficients.pq")
 measurements = []
 

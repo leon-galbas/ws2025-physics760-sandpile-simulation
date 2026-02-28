@@ -93,10 +93,9 @@ class SandpileModel:
             # initialize z randomly close to critical threshold
             if type(z_init) is str:
                 if z_init == "random":
-                    delta = 2
                     self.z = torch.randint(
-                        self.z_c - delta,
-                        self.z_c + delta + 1,
+                        self.z_c - self.d,
+                        self.z_c + 1,
                         size=z_shape,
                         dtype=torch.int64,
                     )
