@@ -1,3 +1,28 @@
-The method for simulating and analyzing sandpiles in this project largely follows the 1991 paper by Christensen et al. \cite{christensen1991dynamical}. A sandpile is defined as a d-dimensional cubic CA of width $N$, meaning that the lattice $R$ has $N^d$ entries.
+Self-organized criticality can be studied through cellular automata \cite{bak1987self}. The specific CA studied in this project is an abstract \emph{sandpile}. While in two dimensions, the analogy to a physical sandpile can be theoretically made, we view a sandpile as an abstract $d$-dimensional CA as defined below. The definitions and the method for simulating and analyzing sandpiles in this project largely follow the 1991 paper by Christensen et al. \cite{christensen1991dynamical}.
 
-The algorithms described above were implemented in Python. For efficient handling of multi-dimensional we used the PyTorch \cite{paszke2019pytorch} library. All further data analysis was performed using NumPy\cite{harris2020array} for efficient data manipulation and Matplotlib \cite{hunter2007matplotlib} for visualization. The source code used to generate all numerical results presented in the following sections is publicly available on GitHub at % TODO: Insert github link
+% TODO: Insert graph visualizing sandpile local slope analogy
+
+A \emph{sandpile} of dimension $d$ and linear size $N$ is defined on the lattice
+\begin{equation}
+    R := (\bN_{\leq N})^d \subseteq \bZ^d.
+\end{equation}
+The neighborhood $M_r$ of a lattice site $r\in R$ is defined as the set of the site itself and all directly adjacent lattice sites
+\begin{equation}
+    M_r := \{r\} \cap \{r \pm e_i \mid 1\leq i\leq d\},
+\end{equation}
+where $e_i$ is the lattice's $i$-th canonical unit vector. The configuration $z$ assigns an integer $z_\tau(r)\in\bZ$ to each lattice site $r$ at time $\tau$. Christensen et al. \cite{christensen1991dynamical} call this configuration the \emph{local slope} of the sandpile at time $\tau$, which is motivated by the physical analogy shown in Figure \ref{fig:local_slope}. Another, perhaps more universal, way is to think of $z$ as the \emph{local energy} of the system at a lattice site \cite{barrat1999fluctuations}. We shall from now on stick to this analogy. Next, we define a critical threshold $z_c\in\bZ$. The sandpile is \emph{stable}, if at a given time step, $z(r) \leq z_c$ for all $r\in R$. Otherwise, the system is \emph{unstable}. The time evolution of the sandpile is then specified as follows:
+
+If the sandpile is stable, the local evolution leaves $z$ constant, i.e. $z_{\tau+1}(r) = z_\tau(r)$ for all $r$. Hence, without changing $z$ through an external perturbation, a stable sandpile does not change in time at all. For an unstable sandpile, let
+\begin{equation}
+    R_u(\tau) := \{r\in R \mid z_\tau(r) > z_c\}
+\end{equation}
+be the set of all unstable sites. Then at each unstable lattice site a \emph{toppling} event occurs, which dissipates one unit of energy from the unstable site to each of its $2d$ direct neighbors. The time evolution at time step $\tau$ thus reads
+\begin{align}
+    z_\tau(r) &\to z_\tau(r) - 2d =: z_{\tau+1}(r), \\
+    z_\tau(r\pm e_i) &\to z_\tau(r\pm e_i) =: z_{\tau+1}(r\pm e_i) \qq{for} 1\leq i\leq d,
+\end{align}
+for all $r\in R_u(\tau)$. One time evolution step of an unstable sandpile is called a \emph{relaxation} and happens simultaneously at every unstabe lattice site.
+
+
+The algorithms described above were implemented in Python. For efficient handling of multi-dimensional data we used the PyTorch \cite{paszke2019pytorch} library. All further data analysis was performed using NumPy \cite{harris2020array} for data manipulation and Matplotlib \cite{hunter2007matplotlib} for visualization. The source code used to generate all numerical results presented in the following sections is publicly available on GitHub at
+% TODO: Insert github link
