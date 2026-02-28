@@ -118,6 +118,8 @@ class SandpileModel:
         )
         self._data.loc[0] = 0
 
+        logging.info(f"SandpileModel initialized with {N=}, {d=}, z_c={self._z_c}.")
+
     # ---------- PUBLIC METHODS ----------
 
     def burn_in(
@@ -157,6 +159,12 @@ class SandpileModel:
                     x = np.arange(window_size)
                     y = np.array(z_averages)
                     fit = linregress(x, y)
+
+                    # periodically log the z_mean_slope
+                    if burn_in_steps % (check_interval * window_size) == 0:
+                        logging.info(
+                            f"Step {burn_in_steps}: z_mean_slope = {fit.slope}"
+                        )
 
                     # Stop of z_mean slope is below threshold
                     if abs(fit.slope) < epsilon:
@@ -421,3 +429,7 @@ class SandpileModel:
     @property
     def data(self) -> pd.DataFrame:
         return self._data
+
+    @property
+    def num_measurements(self) -> int:
+        return len(self._data)

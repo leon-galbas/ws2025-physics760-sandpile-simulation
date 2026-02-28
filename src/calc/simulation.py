@@ -18,10 +18,14 @@ def run_simulation(
             "A simulation with these hyperparameters has already been run. Loading..."
         )
         model = load_model(model_name)
+        n = num_measurements - model.num_measurements
+        if n > 0:
+            logging.info(f"Performing missing {n=} measurements.")
+            model.measure(num_measurements=n)
     else:
         model = SandpileModel(N, d)
         model.burn_in()
-        model.measure(num_measurements=1e6)
+        model.measure(num_measurements=num_measurements)
         model.save(model_name)
 
     # compute scaling exponents
