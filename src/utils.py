@@ -1,3 +1,8 @@
+import os
+from pathlib import Path
+
+import numpy as np
+import polars as pl
 import yaml
 
 
@@ -28,3 +33,30 @@ def read_config(*keys, filepath="src/config.yml"):
         value = value[key]
 
     return value
+
+
+def numpy_to_list(obj):
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()
+    else:
+        return obj
+
+
+def append_dict_to_parquet(dict_in, outfile):
+    path = Path(outfile)
+    tmp_path = path.with_suffix(".tmp.pq")
+
+    # Convert numpy arrays to lists
+    dict_in = {k: numpy_to_list(v) for k, v in dict_in.items()}
+
+    # Combine existing data with new data
+    new_df = pl.DataFrame([dict_in])
+    if path.exists():
+        existing_df = pl.read_parquet(path)
+        combined_df = pl.concat([existing_df, new_df], how="vertical")
+    else:
+        combined_df = new_df
+
+    # Write to temporary file and rename if successful
+    combined_df.write_parquet(tmp_path)
+    os.replace(tmp_path, path)
