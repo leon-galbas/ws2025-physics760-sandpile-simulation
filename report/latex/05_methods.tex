@@ -2,7 +2,7 @@ Self-organized criticality can be studied through cellular automata \cite{bak198
 
 % TODO: Insert graph visualizing sandpile local slope analogy
 
-A \emph{sandpile} of dimension $d$ and linear size $N$ is defined on the lattice
+A sandpile of dimension $d$ and linear size $N$ is defined on the lattice
 \begin{equation}
     R := (\bN_{\leq N})^d \subseteq \bZ^d.
 \end{equation}
@@ -10,7 +10,7 @@ The neighborhood $M_r$ of a lattice site $r\in R$ is defined as the set of the s
 \begin{equation}
     M_r := \{r\} \cap \{r \pm e_i \mid 1\leq i\leq d\},
 \end{equation}
-where $e_i$ is the lattice's $i$-th canonical unit vector. The configuration $z$ assigns an integer $z_\tau(r)\in\bZ$ to each lattice site $r$ at time $\tau$. Christensen et al. \cite{christensen1991dynamical} call this configuration the \emph{local slope} of the sandpile at time $\tau$, which is motivated by the physical analogy shown in Figure \ref{fig:local_slope}. Another, perhaps more universal, way is to think of $z$ as the \emph{local energy} of the system at a lattice site \cite{barrat1999fluctuations}. We shall from now on stick to this analogy. Next, we define a critical threshold $z_c\in\bZ$. The sandpile is \emph{stable}, if at a given time step, $z(r) \leq z_c$ for all $r\in R$. Otherwise, the system is \emph{unstable}. The time evolution of the sandpile is then specified as follows:
+where $e_i$ is the lattice's $i$-th canonical unit vector. The configuration $z$ assigns an integer $z_\tau(r)\in\bZ$ to each lattice site $r$ at time $\tau$. Christensen et al. \cite{christensen1991dynamical} call this configuration the \emph{local slope} of the sandpile at time $\tau$, which is motivated by the physical analogy shown in Figure \ref{fig:local_slope}. Another, perhaps more universal, way is to think of $z$ as the \emph{local energy} of the system at a lattice site \cite{barrat1999fluctuations},\cite{markovic2014power}. We shall from now on stick to this analogy. Next, we define a critical threshold $z_c\in\bZ$. The sandpile is \emph{stable}, if at a given time step, $z(r) \leq z_c$ for all $r\in R$. Otherwise, the system is \emph{unstable}. The time evolution of the sandpile is then specified as follows:
 
 If the sandpile is stable, the local evolution leaves $z$ constant, i.e. $z_{\tau+1}(r) = z_\tau(r)$ for all $r$. Hence, without changing $z$ through an external perturbation, a stable sandpile does not change in time at all. For an unstable sandpile, let
 \begin{equation}
@@ -18,11 +18,33 @@ If the sandpile is stable, the local evolution leaves $z$ constant, i.e. $z_{\ta
 \end{equation}
 be the set of all unstable sites. Then at each unstable lattice site a \emph{toppling} event occurs, which dissipates one unit of energy from the unstable site to each of its $2d$ direct neighbors. The time evolution at time step $\tau$ thus reads
 \begin{align}
-    z_\tau(r) &\to z_\tau(r) - 2d =: z_{\tau+1}(r), \\
-    z_\tau(r\pm e_i) &\to z_\tau(r\pm e_i) =: z_{\tau+1}(r\pm e_i) \qq{for} 1\leq i\leq d,
+    z_\tau(r) &\to z_\tau(r) - 2d =: z_{\tau+1}(r), \label{eqn:relaxation} \\
+    z_\tau(r\pm e_i) &\to z_\tau(r\pm e_i) =: z_{\tau+1}(r\pm e_i) \qq{for} i=1,\ldots,d \nonumber
 \end{align}
-for all $r\in R_u(\tau)$. One time evolution step of an unstable sandpile is called a \emph{relaxation} and happens simultaneously at every unstabe lattice site.
+for all $r\in R_u(\tau)$. The time evolution step of an unstable sandpile is also called \emph{relaxation} and all topplings happen simultaneously at every unstable lattice site.
 
+Inside the lattice, relaxation events preserve the total energy $\sum_{r\in r}z(r)$ of the system, as can be seen from Equation \ref{eqn:relaxation}. Only at the lattice boundaries, where $r_i=1$ or $r_i=N$ for some $1\leq i\leq N$, can the energy be dissipated.
+
+% TODO explain boundary conditions
+
+Hence, after a certain amount of relaxation steps, we reach a stable state. In order to observe criticality, we must therefore introduce an external perturbation that changes the configuration $z$ of the sandpile. The perturbation is implemented in the slow driving limit \cite{barrat1999fluctuations}, which means that perturbation and relaxation happen on different time scales. Christensen et al. \cite{christensen1991dynamical} define two types of perturbations. A \emph{conservative} perturbation of a lattice site $r_0$ given by
+\begin{align}
+    z(r_0) &\to z(r_0) + d, \label{eqn:con_perturb} \\
+    z(r_0-e_i) &\to z(r_0-e_i) - 1 \qq{for} i=1,\ldots,d
+\end{align}
+keeps the total energy of the system constant, while a \emph{nonconservative} perturbation
+\begin{equation}
+    z(r_0) \to z(r_0) + 1 \label{eqn:noncon_perturb}
+\end{equation}
+adds a unit of energy to a random point on the sandpile. The driven sandpile system is then simulated by specifying an initial configuration $z_0(r)$ and iterating through the following steps:
+% TODO: replace by pseudocode algorithm
+\begin{enumerate}
+    \item Step 1: While $\exists r\in R:\, z_\tau(r) > z_c$: repeatedly apply relaxation steps until the sandpile settles in a stable state after $t$ steps.
+    \item Step 2: Choose a random $r_0\in R$.
+    \item Step 3: Perturb the system at $r_0$.
+    \item Step 4: Go to Step 1.
+\end{enumerate}
+Notice that the perturbations happen on a macroscopic time scale (the outer loop), while the relaxation steps are the microscopic evolution of the CA.
 
 The algorithms described above were implemented in Python. For efficient handling of multi-dimensional data we used the PyTorch \cite{paszke2019pytorch} library. All further data analysis was performed using NumPy \cite{harris2020array} for data manipulation and Matplotlib \cite{hunter2007matplotlib} for visualization. The source code used to generate all numerical results presented in the following sections is publicly available on GitHub at
 % TODO: Insert github link
