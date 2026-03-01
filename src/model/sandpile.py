@@ -172,7 +172,9 @@ class SandpileModel:
         if epsilon is None:
             k = 5
             volume = np.pow(self.N, self.d)
-            sigma_m = np.sqrt(12.0 / (volume * np.pow(window_size, 3)))
+            sigma_m = np.sqrt(
+                12.0 / (volume * window_size * (np.pow(window_size, 2) - 1))
+            )
             epsilon = k * sigma_m
 
         z_averages = deque(maxlen=window_size)

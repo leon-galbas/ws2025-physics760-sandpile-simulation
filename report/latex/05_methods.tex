@@ -27,12 +27,14 @@ Inside the lattice, relaxation events preserve the total energy $\sum_{r\in r}z(
 
 % TODO explain boundary conditions
 
-Hence, after a certain amount of relaxation steps, we reach a stable state. In order to observe criticality, we must therefore introduce an external perturbation that changes the configuration $z$ of the sandpile. The perturbation is implemented in the slow driving limit \cite{barrat1999fluctuations}, which means that perturbation and relaxation happen on different time scales. Christensen et al. \cite{christensen1991dynamical} define two types of perturbations. A \emph{conservative} perturbation of a lattice site $r_0$ given by
+Hence, after a certain amount of relaxation steps, we reach a stable state. A consecutive number of $t$ relaxations which brings an unstable sandpile to a stable state is called an \emph{avalanche} of lifetime $t$.
+
+In order to observe criticality, we must introduce an external perturbation that changes the configuration $z$ of the sandpile. The perturbation is implemented in the slow driving limit \cite{barrat1999fluctuations}, which means that perturbation and relaxation happen on different time scales. Christensen et al. \cite{christensen1991dynamical} define two types of perturbations. A \emph{conservative} perturbation of a lattice site $r_0$ given by
 \begin{align}
     z(r_0) &\to z(r_0) + d, \label{eqn:con_perturb} \\
     z(r_0-e_i) &\to z(r_0-e_i) - 1 \qq{for} i=1,\ldots,d
 \end{align}
-keeps the total energy of the system constant, while a \emph{nonconservative} perturbation
+keeps the total energy of the system constant (except for the lower boundaries), while a \emph{nonconservative} perturbation
 \begin{equation}
     z(r_0) \to z(r_0) + 1 \label{eqn:noncon_perturb}
 \end{equation}
@@ -45,6 +47,35 @@ adds a unit of energy to a random point on the sandpile. The driven sandpile sys
     \item Step 4: Go to Step 1.
 \end{enumerate}
 Notice that the perturbations happen on a macroscopic time scale (the outer loop), while the relaxation steps are the microscopic evolution of the CA.
+
+After a transient period of $T$ macroscopic time steps, which we also call \emph{burn-in} phase, some sandpiles reach a stationary state. The burn-in time $T$ depends on the initial configuration of the system as well as the chosen boundary conditions and perturbations. There are also configurations, like the closed system with conservative perturbation, that do not reach a stationary state at all \cite{christensen1991dynamical}. In the stationary state, which we also call critical state, the average energy
+\begin{equation}
+    \expval{z}(\tau) = \frac{1}{\abs{R}}\sum_{r\in R}z_\tau(r) \label{eqn:z_mean}
+\end{equation}
+fluctuates around a temporal mean value
+\begin{equation}
+    \overline{\expval{z}} = \lim_{T'\to\infty}\frac{1}{T'-T}\int_{T}^{T'}\expval{z}(\tau)\dd{\tau}.
+\end{equation}
+This means that in this state, the energy introduced to the sandpile by each perturbation averages out with the energy lost through avalanches by dissipation at the boundaries over time. Once a sandpile has reached a critical state, it remains in this state \cite{gros2015cellular}. Hence the term Self-Organized Criticality \cite{Dhar1990}.
+
+While Christensen et al. initialize all sandpiles with $z_0=0$ everywhere and run Algorithm \cite{alg:step} until $\expval{z}(\tau)$ becomes stationary, we introduce two additional burn in strategies, in an effort to reduce the burn-in time $T$ and converge to the stationary state more quickly:
+\begin{itemize}
+    \item Random initialization: For every $r\in R$ we initialize $z_0$ to an independent uniformly distributed integer between zero and $z_c$.
+    \item Maximally stable initialization: We initialize $z_0(r) = z_c$ for all $r\in R$.
+\end{itemize}
+The idea behind these approaches is that instead of zero initialization, the sandpile already contains energy at the start. Therefore less perturbations are expected to be necessary to introduce energy and bring the empty system towards its critical state.
+
+In order to implement the model burn-in, we need to define a criterion to decide, whether a stationary state has been reached. We do this by logging $\expval{z}(\tau_k)$ every $\Delta\tau_c$ steps. After having obtained at least $W$ values, we do a linear least squares fit of $\expval{z}(\tau_k)$ against $k$ for a rolling window of the last $W$ values. If the slope $m$ of this fit satisfies $\abs{m}<\eps$ for some threshold $\eps > 0$, we say that $\expval{z}$ is stationary. The value of $\expval{z}(\tau)$ naturally fluctuates around $\overline{\expval{z}}$. The mean energy $\expval{z}(\tau)$ acts as an intensive thermodynamic control parameter \cite{vespignani1998how}. Its fluctuation thus scales with the system volume \cite{landau1969fluctuations} given by
+\begin{equation}
+    \Delta\expval{z} \propto \frac{1}{\sqrt{V}} = \frac{1}{\sqrt{N^d}}.
+\end{equation}
+The standard deviation for a linear least squares fit of $W$ values with error free integers on the $x$-axis and constant errors on the $y$-axis is widely known \cite{bevington2003data} to be
+\begin{equation}
+    \sigma_m = \Delta\expval{z}\sqrt{\frac{12}{W(W^2-1)}} = \sqrt{\frac{12}{N^dW(W^2-1)}}.
+\end{equation}
+It is thus sensible to choose $\epsilon > 5\sigma_m$. This way, a system is assumed to be unstationary if its fluctuations of $\expval{z}(\tau)$ lie outside the $5\sigma$-interval of the natural fluctuations int $\expval{z}$.
+
+Once we have a sandpile in a critical state, we measure certain statistical properties of avalanches happening between perturbations. Christensen et al. propose three avalanche characteristics that can be measured.
 
 The algorithms described above were implemented in Python. For efficient handling of multi-dimensional data we used the PyTorch \cite{paszke2019pytorch} library. All further data analysis was performed using NumPy \cite{harris2020array} for data manipulation and Matplotlib \cite{hunter2007matplotlib} for visualization. The source code used to generate all numerical results presented in the following sections is publicly available on GitHub at
 % TODO: Insert github link
