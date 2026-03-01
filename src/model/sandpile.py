@@ -90,15 +90,18 @@ class SandpileModel:
         # init z tensor
         z_shape = (N,) * d
         if z_init is not None:
-            # initialize z randomly close to critical threshold
             if type(z_init) is str:
+                # initialize z randomly between 0 and z_c
                 if z_init == "random":
                     self.z = torch.randint(
-                        self.z_c - self.d,
+                        0,
                         self.z_c + 1,
                         size=z_shape,
                         dtype=torch.int64,
                     )
+                # initialize z at maximally stable value
+                elif z_init == "max":
+                    self.z = self.z_c * torch.ones(z_shape, dtype=torch.int64)
                 else:
                     raise ValueError(
                         f"Invalid parameter {z_init=}. Did you mean z_init='random'?"
