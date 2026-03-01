@@ -75,7 +75,19 @@ The standard deviation for a linear least squares fit of $W$ values with error f
 \end{equation}
 It is thus sensible to choose $\epsilon > 5\sigma_m$. This way, a system is assumed to be unstationary if its fluctuations of $\expval{z}(\tau)$ lie outside the $5\sigma$-interval of the natural fluctuations int $\expval{z}$.
 
-Once we have a sandpile in a critical state, we measure certain statistical properties of avalanches happening between perturbations. Christensen et al. propose three avalanche characteristics that can be measured.
+Once we have a sandpile in a critical state, we measure certain statistical properties of avalanches happening between perturbations. Christensen et al. propose three avalanche characteristics that can be measured. Let $\tau=0$ be the time step at which an avalanche starts after a perturbation at $r_0\in R$. Then the lifetime $t$ of the avalanche is the total number of microscopic time steps it takes for the sandpile to reach a stable state, as described above
+\begin{equation}
+    t = \min\{\tau\geq0 \mid R_u(\tau) = \emptyset\}.
+\end{equation}
+The total size $s$ of the avalanche is defined as the cumulative sum of the number of toppling events, i.e. the number of unstable lattice sites, that happen during each relaxation step
+\begin{equation}
+    s = \sum_{\tau=0}^t \abs{R_u(\tau)}.
+\end{equation}
+The linear size $l$ of the avalanche is the maximum coordinate distance from the perturbation center to any point that is affected by the avalanche
+\begin{equation}
+    l = \max_{0\leq\tau\leq t}\{\norm{r_0-r_u}_\infty \mid r\in R_u(\tau)\}.
+\end{equation}
+
 
 The algorithms described above were implemented in Python. For efficient handling of multi-dimensional data we used the PyTorch \cite{paszke2019pytorch} library. All further data analysis was performed using NumPy \cite{harris2020array} for data manipulation and Matplotlib \cite{hunter2007matplotlib} for visualization. The source code used to generate all numerical results presented in the following sections is publicly available on GitHub at
 % TODO: Insert github link
