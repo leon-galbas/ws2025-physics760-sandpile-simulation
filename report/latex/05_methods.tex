@@ -26,6 +26,7 @@ for all $r\in R_u(\tau)$. The time evolution step of an unstable sandpile is als
 Inside the lattice, relaxation events preserve the total energy $\sum_{r\in r}z(r)$ of the system, as can be seen from Equation \ref{eqn:relaxation}. Only at the lattice boundaries, where $r_i=1$ or $r_i=N$ for some $1\leq i\leq N$, can the energy be dissipated.
 
 % TODO explain boundary conditions
+TODO: BOUNDARY CONDITIONS
 
 Hence, after a certain amount of relaxation steps, we reach a stable state. A consecutive number of $t$ relaxations which brings an unstable sandpile to a stable state is called an \emph{avalanche} of lifetime $t$.
 
@@ -41,6 +42,7 @@ keeps the total energy of the system constant (except for the lower boundaries),
 adds a unit of energy to a random point on the sandpile. The driven sandpile system is then simulated by specifying an initial configuration $z_0(r)$ and iterating through the following steps:
 % TODO: replace by pseudocode algorithm
 \begin{enumerate}
+    \item REPLACE BY PROPER PSEUDOCODE
     \item Step 1: While $\exists r\in R:\, z_\tau(r) > z_c$: repeatedly apply relaxation steps until the sandpile settles in a stable state after $t$ steps.
     \item Step 2: Choose a random $r_0\in R$.
     \item Step 3: Perturb the system at $r_0$.
@@ -58,7 +60,7 @@ fluctuates around a temporal mean value
 \end{equation}
 This means that in this state, the energy introduced to the sandpile by each perturbation averages out with the energy lost through avalanches by dissipation at the boundaries over time. Once a sandpile has reached a critical state, it remains in this state \cite{gros2015cellular}. Hence the term Self-Organized Criticality \cite{Dhar1990}.
 
-While Christensen et al. initialize all sandpiles with $z_0=0$ everywhere and run Algorithm \cite{alg:step} until $\expval{z}(\tau)$ becomes stationary, we introduce two additional burn in strategies, in an effort to reduce the burn-in time $T$ and converge to the stationary state more quickly:
+While Christensen et al. initialize all sandpiles with $z_0=0$ everywhere and run Algorithm \ref{alg:step} until $\expval{z}(\tau)$ becomes stationary, we introduce two additional burn in strategies, in an effort to reduce the burn-in time $T$ and converge to the stationary state more quickly:
 \begin{itemize}
     \item Random initialization: For every $r\in R$ we initialize $z_0$ to an independent uniformly distributed integer between zero and $z_c$.
     \item Maximally stable initialization: We initialize $z_0(r) = z_c$ for all $r\in R$.
@@ -73,7 +75,7 @@ The standard deviation for a linear least squares fit of $W$ values with error f
 \begin{equation}
     \sigma_m = \Delta\expval{z}\sqrt{\frac{12}{W(W^2-1)}} = \sqrt{\frac{12}{N^dW(W^2-1)}}.
 \end{equation}
-It is thus sensible to choose $\epsilon > 5\sigma_m$. This way, a system is assumed to be unstationary if its fluctuations of $\expval{z}(\tau)$ lie outside the $5\sigma$-interval of the natural fluctuations int $\expval{z}$.
+It is thus sensible to choose $\epsilon > 5\sigma_m$. This way, a system is assumed to be unstationary if its fluctuations of $\expval{z}(\tau)$ lie outside the $5\sigma$-interval of the natural fluctuations int $\expval{z}$. The chosen parameters for the check interval and window size are $\Delta\tau_c=1000$ and $W=50$.
 
 Once we have a sandpile in a critical state, we measure certain statistical properties of avalanches happening between perturbations. Christensen et al. propose three avalanche characteristics that can be measured. Let $\tau=0$ be the time step at which an avalanche starts after a perturbation at $r_0\in R$. Then the lifetime $t$ of the avalanche is the total number of microscopic time steps it takes for the sandpile to reach a stable state, as described above
 \begin{equation}
@@ -86,6 +88,26 @@ The total size $s$ of the avalanche is defined as the cumulative sum of the numb
 The linear size $l$ of the avalanche is the maximum coordinate distance from the perturbation center to any point that is affected by the avalanche
 \begin{equation}
     l = \max_{0\leq\tau\leq t}\{\norm{r_0-r_u}_\infty \mid r\in R_u(\tau)\}.
+\end{equation}
+When the system is in a critical state, we expect the behavior of avalanche characteristics to be scale free and thus obey power laws \cite{christensen1991dynamical}. They are typically defined
+\begin{align}
+    P(T=t) &\propto t^{1-\alpha}, \nonumber \\
+    P(S=s) &\propto s^{1-\tau}, \\
+    P(L=l) &\propto l^{1-\lambda}, \nonumber
+\end{align}
+where $\alpha,\tau,\lambda$ are scaling parameters to be determined. Note that the parameter $\tau$ here is different from the timestep $\tau$ used before. Additionally, we also expect the conditional expectation values of the avalanche parameters with respect to each other to obey power laws
+\begin{align}
+    E[S \mid T=t] &\propto t^{\gamma_1}, \nonumber \\
+    E[T \mid S=s] &\propto t^{1/\gamma_1}, \nonumber \\
+    E[S \mid L=l] &\propto t^{\gamma_2}, \nonumber \\
+    E[L \mid S=s] &\propto t^{1/\gamma_2}, \\
+    E[T \mid L=l] &\propto t^{\gamma_3}, \nonumber \\
+    E[L \mid T=t] &\propto t^{1/\gamma_3}. \nonumber
+\end{align}
+
+In order to measure these scaling parameters for a sandpile, we bring the sandpile into a critical state through a burn-in phase. Then, we continually relax and perturb the system according to Algorithm \ref{alg:step}. Every time an avalanche occurs, we track its characteristics $t$, $s$ and $l$, until we have obtained $N_{\text{measure}}$ samples. We estimate the probability distribution of the random variable $X$ via the relative frequency
+\begin{equation}
+    P(X=x) \approx
 \end{equation}
 
 
