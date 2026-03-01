@@ -40,6 +40,7 @@ class SandpileModel:
     _r_0: tuple
     _data: pd.DataFrame
     _macro_time: int
+    _z_mean_hist: list[float]
 
     # ---------- CONSTRUCTOR ----------
 
@@ -144,6 +145,7 @@ class SandpileModel:
             {col: pd.Series(dtype=dtype) for col, dtype in data_schema.items()}
         )
         self._data.loc[0] = 0
+        self._z_mean_hist.append(self.z_mean)
 
         logging.info(f"SandpileModel initialized with {N=}, {d=}, z_c={self.z_c}.")
 
@@ -181,6 +183,7 @@ class SandpileModel:
         while True:
             _, _, _ = self.relax()
             self.perturb()
+            self._z_mean_hist.append(self.z_mean)
             burn_in_steps += 1
 
             # Check stationarity at intervals to minimize overhead
@@ -227,6 +230,7 @@ class SandpileModel:
             while len(sizes) < num_measurements:
                 s, t, l = self.relax()  # noqa: E741
                 self.perturb()
+                self._z_mean_hist.append(self.z_mean)
                 if s > 0:
                     sizes.append(s)
                     lifetimes.append(t)
@@ -271,6 +275,7 @@ class SandpileModel:
             s[i], t[i], l[i] = self.relax()  # noqa: E741
             self.perturb()
             z_mean[i] = self.z_mean
+            self._z_mean_hist.append(z_mean[i])
         logging.info("Done!")
 
         # save avalanche data
@@ -462,6 +467,10 @@ class SandpileModel:
     @property
     def data(self) -> pd.DataFrame:
         return self._data
+
+    @property
+    def z_mean_hist(self) -> np.ndarray:
+        return np.array(self._z_mean_hist)
 
     @property
     def num_measurements(self) -> int:
