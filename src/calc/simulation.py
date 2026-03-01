@@ -33,6 +33,7 @@ def run_simulation(
             z_init="random",
         )
         model.burn_in()
+        model.save(model_name)
         model.measure(num_measurements=num_measurements)
         model.save(model_name)
 

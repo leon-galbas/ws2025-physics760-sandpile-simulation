@@ -40,6 +40,7 @@ class SandpileModel:
     _r_0: tuple
     _data: pd.DataFrame
     _macro_time: int
+    _z_mean_hist: list[float]
 
     # ---------- CONSTRUCTOR ----------
 
@@ -90,15 +91,18 @@ class SandpileModel:
         # init z tensor
         z_shape = (N,) * d
         if z_init is not None:
-            # initialize z randomly close to critical threshold
             if type(z_init) is str:
+                # initialize z randomly between 0 and z_c
                 if z_init == "random":
                     self.z = torch.randint(
-                        self.z_c - self.d,
+                        0,
                         self.z_c + 1,
                         size=z_shape,
                         dtype=torch.int64,
                     )
+                # initialize z at maximally stable value
+                elif z_init == "max":
+                    self.z = self.z_c * torch.ones(z_shape, dtype=torch.int64)
                 else:
                     raise ValueError(
                         f"Invalid parameter {z_init=}. Did you mean z_init='random'?"
@@ -141,6 +145,7 @@ class SandpileModel:
             {col: pd.Series(dtype=dtype) for col, dtype in data_schema.items()}
         )
         self._data.loc[0] = 0
+        self._z_mean_hist = [self.z_mean]
 
         logging.info(f"SandpileModel initialized with {N=}, {d=}, z_c={self.z_c}.")
 
@@ -167,7 +172,9 @@ class SandpileModel:
         if epsilon is None:
             k = 5
             volume = np.pow(self.N, self.d)
-            sigma_m = np.sqrt(12.0 / (volume * np.pow(window_size, 3)))
+            sigma_m = np.sqrt(
+                12.0 / (volume * window_size * (np.pow(window_size, 2) - 1))
+            )
             epsilon = k * sigma_m
 
         z_averages = deque(maxlen=window_size)
@@ -178,6 +185,7 @@ class SandpileModel:
         while True:
             _, _, _ = self.relax()
             self.perturb()
+            self._z_mean_hist.append(self.z_mean)
             burn_in_steps += 1
 
             # Check stationarity at intervals to minimize overhead
@@ -224,6 +232,7 @@ class SandpileModel:
             while len(sizes) < num_measurements:
                 s, t, l = self.relax()  # noqa: E741
                 self.perturb()
+                self._z_mean_hist.append(self.z_mean)
                 if s > 0:
                     sizes.append(s)
                     lifetimes.append(t)
@@ -268,6 +277,7 @@ class SandpileModel:
             s[i], t[i], l[i] = self.relax()  # noqa: E741
             self.perturb()
             z_mean[i] = self.z_mean
+            self._z_mean_hist.append(z_mean[i])
         logging.info("Done!")
 
         # save avalanche data
@@ -459,6 +469,10 @@ class SandpileModel:
     @property
     def data(self) -> pd.DataFrame:
         return self._data
+
+    @property
+    def z_mean_hist(self) -> np.ndarray:
+        return np.array(self._z_mean_hist)
 
     @property
     def num_measurements(self) -> int:
