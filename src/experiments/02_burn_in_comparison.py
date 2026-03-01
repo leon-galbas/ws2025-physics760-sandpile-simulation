@@ -11,7 +11,7 @@ logging.basicConfig(
     format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
     handlers=[
-        logging.FileHandler(f"{read_config('log_dir')}/measurements.log"),
+        logging.FileHandler(f"{read_config('log_dir')}/burn_in_stats.log"),
         logging.StreamHandler(),
     ],
 )

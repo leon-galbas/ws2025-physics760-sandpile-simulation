@@ -145,7 +145,7 @@ class SandpileModel:
             {col: pd.Series(dtype=dtype) for col, dtype in data_schema.items()}
         )
         self._data.loc[0] = 0
-        self._z_mean_hist.append(self.z_mean)
+        self._z_mean_hist = [self.z_mean]
 
         logging.info(f"SandpileModel initialized with {N=}, {d=}, z_c={self.z_c}.")
 
