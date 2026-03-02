@@ -50,20 +50,20 @@ steps.
 
 After having passed the transient period and arriving at the critical state, we continually relax and perturb the system according to Algorithm \ref{alg:step}. Every time an avalanche occurs, we track its characteristics $t$, $s$ and $l$, until we have obtained $N_{\text{measure}}$ samples. We estimate the probability distribution of the random variable $X$ via the relative frequency
 \begin{equation}
-    P(X=x) = \frac{N_x}{N_{\text{measure}}}
+    P(X=x) = \frac{N_x}{N_{\text{measure}}} \label{eqn:pdf_est}
 \end{equation}
 where $N_x$ is the number of samples for which $X=x$. The standard deviation of this estimator is
 \begin{equation}
-    \sigma_P = \sqrt{\frac{P(x)(1-P(x))}{N}}.
+    \sigma_P = \sqrt{\frac{P(x)(1-P(x))}{N}}. \label{eqn:pdf_err_est}
 \end{equation}
 The conditional expectation values are measured via
 \begin{align}
     \bE [X\mid Y=y] &= \sum_x xP(X=x\mid Y=y) \nonumber \\
-    &\approx \frac{\sum_{i=1}^N X_i\one_{\{Y_i=y\}}}{N_y},
+    &\approx \frac{\sum_{i=1}^N X_i\one_{\{Y_i=y\}}}{N_y}, \label{eqn:condexp_est}
 \end{align}
 where $\one$ is the indicator function. Their standard deviation can be estimated as
 \begin{equation}
-    \sigma_\bE = \sqrt{\frac{\f{Var}(X\mid Y=y)}{N_y}}
+    \sigma_\bE = \sqrt{\frac{\f{Var}(X\mid Y=y)}{N_y}} \label{eqn:condexp_err_est}
 \end{equation}
 with
 \begin{equation}
@@ -74,7 +74,7 @@ To justify this measurement approach, we need to assume avalanche variables $X_i
 %The former is the case in the critical state.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Calculating scaling exponents}
+\subsection{Calculating scaling exponents} \label{sec:calc-scaling-exponents}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 After estimating the relevant probability density functions and expectation values from our measurements, we plot them on a log-log scale. Since
