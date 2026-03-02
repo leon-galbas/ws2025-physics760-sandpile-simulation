@@ -1,81 +1,35 @@
-In this chapter, we discuss what we observe once the simulations are running in practice, and what the measurements tell us. We first focus on the burn-in phase, since it sets the point from which our data can be treated as stationary. We then turn to the scaling exponents extracted from avalanche statistics and comment on how robust they are across models and system sizes. Finally, we summarise the main trends in the results and highlight the most likely sources of systematic error.
-\subsection{Burn-in dynamics and monitoring}
+In the following, we discuss our results and the conclusions that can be drawn from them, comparing them to our main source of Christensen et al. \cite{christensen1991dynamical}.
 
-To measure avalanche statistics, we first need the system to settle into a steady state. The early part of the run is the burn-in phase. In this phase, average quantities still change with time. We monitor this by tracking the mean energy (mean slope) $\langle z\rangle(\tau)$ and waiting until it stops showing a clear trend.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Burn-in dynamics and monitoring}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Models A and B behave differently because they introduce energy differently. Model A uses nonconservative driving, so it increases the total energy directly and the system reaches the stationary energy density relatively quickly. Model B uses a conservative perturbation. In the bulk it keeps the total energy roughly constant and mainly redistributes what is already there. Starting from an empty lattice, this makes model B take much longer to build up to the stationary level than model A.
 
 A reasonable explanation is that, with our boundary conditions, conservative perturbations only create a net energy increase through boundary effects. The conservative update subtracts energy from shifted neighbour sites. At the boundaries some of these sites are clamped (especially at the lower boundary), so this subtraction can be partly blocked. This means the perturbation can effectively add energy only when it interacts with the edges, while perturbations in the bulk are close to energy-neutral. If most of the net input comes from the edges, then the build-up from $z_0=0$ is naturally slower and more sensitive to how the boundaries are implemented.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Reducing burn-in by changing the initial condition}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The long burn-in in model B is mainly due to how slowly the system fills up when starting from $z_0=0$. A direct way to shorten it is to start closer to the stationary energy density. This motivates the alternative initial conditions: random initialization $z_0\sim U(0,z_c)$ and maximally stable initialization $z_0=z_c$. Both preload the lattice with energy, so fewer driving steps are needed before $\langle z\rangle(\tau)$ stops drifting.
 
 These initial conditions also reduce the time spent in a clearly nonstationary regime, where avalanches are not representative of the steady state. The benefit is largest for conservative driving, where the fill-up stage is slowest. For cases that equilibrate quickly, the burn-in time still cannot drop below the built-in minimum $T_{\min}$ set by the stationarity check procedure.
 
-\subsection{Scaling exponent measurements and comparison to literature}
-After preparing each system in Table~\ref{tab:model_configurations} in the
-critical state, we measure the avalanche observables $t$, $s$ and $l$.
-From these measurements we estimate the PDFs and fit power laws in the
-scaling region (see the example fits in Fig.~\ref{fig:pdf-plot-example}).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Scaling Behavior and Avalanche Statistics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-On the double-logarithmic PDF plots, the scaling region appears as an
-approximately straight line. At small $t,s,l$ we do not expect perfect
-scaling because of discretization effects and because avalanches are still
-``small''. At large $t,s,l$ we see a cutoff due to finite system size and
-limited statistics (especially for the $d=4$ systems in
-Table~\ref{tab:model_configurations}, where we used fewer measurements).
-Because of these effects, the choice of the fitting window has a direct
-impact on the fitted slope (as visible in Fig.~\ref{fig:pdf-plot-example}).
+Once the burn-in phase concludes, the system arrives at a self-organized critical state where the average energy $\langle z \rangle(\tau)$ fluctuates stably around a temporal mean $\overline{\langle z \rangle}$. The probability distributions for the measured avalanche observables, lifetime $t$, size $s$, and linear size $l$, exhibit approximate power-law behavior within an intermediate scaling region. The emergence of power laws directly indicates the absence of an intrinsic length or time scale within the system. In the self-organized critical state, spatial correlations extend across all length scales of the lattice. Consequently, a single microscopic perturbation can trigger a relaxation event of any size, ranging from a single local rearrangement to a massive, system-spanning avalanche. This continuous scale invariance confirms that the stationary regime acts as a true critical attractor. The scaling exponents $\alpha$, $\tau$, and $\lambda$ govern these respective distributions and mathematically formalize this scale-free behavior.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Dimensionality, Boundary Conditions, and Driving Mechanisms}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-The fitted PDF exponents for the open nonconservative systems (configs
-A, D, G) are listed in Table~\ref{tab:scaling_exp_open_nonconservative}.
-The corresponding results for the open conservative systems (configs
-B, E, H) are given in Table~\ref{tab:scaling_exp_open_conservative}, and for
-the closed nonconservative systems (configs C, F, I) in
-Table~\ref{tab:scaling_exp_closed_nonconservative}.
-Overall, the fitted values follow the expected trend with dimension: the
-distributions become steeper with increasing $d$, and the scaling window is
-typically shorter in higher dimensions, which increases the fit uncertainty.
-This is most visible for the $l$-fits (the exponent $\lambda$), where the
-cutoff sets in early and the statistics at large $l$ are weaker.
+The measured scaling exponents demonstrate a measurable dependence on the implemented driving scheme. In two dimensions ($d=2$), the conservative drive (Configuration B) yields steeper probability distributions, with $\alpha \approx 2.280$ and $\tau \approx 2.414$, compared to the nonconservative drive (Configuration A), which produces $\alpha \approx 2.018$ and $\tau \approx 2.058$. The nonconservative drive introduces a net unit of energy into the system at a random coordinate, fundamentally acting as an external energy source. The conservative drive redistributes existing energy locally by transferring $d$ units to the center and subtracting one from neighbors. This fundamental difference in the local interaction rules alters the underlying correlation structures of the avalanches, placing them into different universality classes with distinct scaling exponents. However, altering the specific topography of dissipation from open to closed boundaries under nonconservative driving yields highly similar scaling exponents, as evidenced by comparing Configurations A and C. The local relaxation rule dictates the scale-free nature, and energy is uniformly injected regardless of boundary geometry, leading to consistent scaling behaviors across boundary types.
 
-Comparing boundary conditions for the nonconservative perturbation (open:
-Table~\ref{tab:scaling_exp_open_nonconservative} vs.\ closed:
-Table~\ref{tab:scaling_exp_closed_nonconservative}), the exponents are
-similar within the uncertainties. This suggests that changing open to closed
-boundaries does not strongly change the bulk scaling, as long as avalanches
-can still dissipate energy by the chosen dynamics.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Literature Comparison and Mean-Field Limit}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Comparing perturbation schemes at open boundaries (nonconservative:
-Table~\ref{tab:scaling_exp_open_nonconservative} vs.\ conservative:
-Table~\ref{tab:scaling_exp_open_conservative}), we observe systematic shifts
-in the fitted exponents. In particular, the conservative perturbation tends
-to give steeper PDFs, which means very large avalanches are relatively less
-likely in that setup.
-
-
-The conditional expectation value fits are illustrated in
-Fig.~\ref{fig:cond-plot-example}. The measured conditional exponents for the
-open nonconservative systems are summarized in
-Table~\ref{tab:scaling_exp_open_nonconservative_gamma}, for open
-conservative in Table~\ref{tab:scaling_exp_open_conservative_gamma}, and for
-closed nonconservative in Table~\ref{tab:scaling_exp_closed_nonconservative_gamma}.
-In general, the relations involving $s$ and $t$ show the most stable scaling
-regions, while relations that involve $l$ tend to have larger uncertainties.
-A simple reason is that large-$l$ events are rare, so conditional averages
-at large conditioning values have larger noise, and the fitted slope depends
-more on the exact window choice (as also visible in
-Fig.~\ref{fig:cond-plot-example}).
-
-
-The reference values reported by Christensen et al.\ can be compared
-directly to our fitted exponents in
-Tables~\ref{tab:scaling_exp_open_nonconservative}--\ref{tab:scaling_exp_closed_nonconservative_gamma}.
-Overall, our results show the same qualitative trends with dimension and
-with the choice of perturbation/boundary conditions. Remaining differences
-are expected from finite-size effects, the limited scaling window, and the
-fact that exponent estimates depend on the fitting procedure and on the
-chosen range (see Fig.~\ref{fig:pdf-plot-example} and
-Fig.~\ref{fig:cond-plot-example}).
+The measured scaling exponents across the simulated configurations are broadly consistent with the foundational numerical estimates established by Christensen, Fogedby, and Jensen \cite{christensen1991dynamical}. The largest deviations from expected theoretical values, coupled with the highest measurement uncertainties, manifest in four dimensions ($d=4$). The total number of lattice sites scales with the volume $|R| = N^{d}$. To maintain computational feasibility, the linear size of the $d=4$ lattices is restricted to $N=20$. Because the maximum physical extent of an avalanche is strictly bounded by the linear system size $N$, the intermediate scaling region is severely compressed. This narrow window makes it exceedingly difficult to decouple the theoretical power-law behavior from the lower lattice cutoff and the upper exponential finite-size cutoff. Consequently, the heuristic fitting procedure struggles to find a stable linear region, leading to higher systematic errors and significant deviations from the values predicted by mean-field theory.
