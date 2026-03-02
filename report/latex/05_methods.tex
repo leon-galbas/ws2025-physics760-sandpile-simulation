@@ -19,16 +19,30 @@ If the sandpile is stable, the local evolution leaves $z$ constant, i.e. $z_{\ta
 be the set of all unstable sites. Then at each unstable lattice site a \emph{toppling} event occurs, which dissipates one unit of energy from the unstable site to each of its $2d$ direct neighbors. The time evolution at time step $\tau$ thus reads
 \begin{align}
     z_\tau(r) &\to z_\tau(r) - 2d =: z_{\tau+1}(r), \label{eqn:relaxation} \\
-    z_\tau(r\pm e_i) &\to z_\tau(r\pm e_i) =: z_{\tau+1}(r\pm e_i) \qq{for} i=1,\ldots,d \nonumber
+    z_\tau(r\pm e_i) &\to z_\tau(r\pm e_i) + 1 =: z_{\tau+1}(r\pm e_i) \qq{for} i=1,\ldots,d \nonumber
 \end{align}
 for all $r\in R_u(\tau)$. The time evolution step of an unstable sandpile is also called \emph{relaxation} and all topplings happen simultaneously at every unstable lattice site.
 
-Inside the lattice, relaxation events preserve the total energy $\sum_{r\in r}z(r)$ of the system, as can be seen from Equation \ref{eqn:relaxation}. Only at the lattice boundaries, where $r_i=1$ or $r_i=N$ for some $1\leq i\leq N$, can the energy be dissipated.
+Inside the lattice, relaxation events preserve the total energy
+\begin{equation}
+    \sum_{r\in r}z(r)
+\end{equation}
+of the system, as can be seen from Equation \ref{eqn:relaxation}. Only at the lattice boundaries, where $r_i=1$ or $r_i=N$ for some $1\leq i\leq N$, can the energy be dissipated.
 
-% TODO: explain boundary conditions
-TODO: BOUNDARY CONDITIONS
+Following \cite{christensen1991dynamical}, we consider two kinds of boundary conditions. In \emph{open} boundary conditions, the relaxation step is modified to
+\begin{align}
+    z_\tau(r) &\to z_\tau(r) - 2d + (\text{number of }i\text{ with }r_i=N), \nonumber \\
+    z_\tau(r+e_i) &\to z_\tau(r+e_i) + 1 \qq{if} r_i\neq N, \\
+    z_\tau(r-e_i) &\to z_\tau(r-e_i) + 1 \qq{for} i=1,\ldots,d, \nonumber \\
+\intertext{and}
+    z_\tau(r) &= 0 \qq{if} r_i=1 \text{ for any i}. \nonumber
+\end{align}
+Furthermore, we define closed boundary conditions by enforcing
+\begin{equation}
+    z_\tau(r) &= 0 \qq{if} r_i=1\text{ or } r_i=N \text{ for any i}.
+\end{equation}
 
-Hence, after a certain amount of relaxation steps, we reach a stable state. A consecutive number of $t$ relaxations which brings an unstable sandpile to a stable state is called an \emph{avalanche} of lifetime $t$.
+After a certain amount of relaxation steps, we reach a stable state. A consecutive number of $t$ relaxations which brings an unstable sandpile to a stable state is called an \emph{avalanche} of lifetime $t$.
 
 In order to observe criticality, we must introduce an external perturbation that changes the configuration $z$ of the sandpile. The perturbation is implemented in the slow driving limit \cite{barrat1999fluctuations}, which means that perturbation and relaxation happen on different time scales. Christensen et al. \cite{christensen1991dynamical} define two types of perturbations. A \emph{conservative} perturbation of a lattice site $r_0$ given by
 \begin{align}
