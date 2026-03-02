@@ -39,7 +39,7 @@ Following \cite{christensen1991dynamical}, we consider two kinds of boundary con
 \end{align}
 Furthermore, we define closed boundary conditions by enforcing
 \begin{equation}
-    z_\tau(r) &= 0 \qq{if} r_i=1\text{ or } r_i=N \text{ for any i}.
+    z_\tau(r) = 0 \qq{if} r_i=1\text{ or } r_i=N \text{ for any i}.
 \end{equation}
 
 After a certain amount of relaxation steps, we reach a stable state. A consecutive number of $t$ relaxations which brings an unstable sandpile to a stable state is called an \emph{avalanche} of lifetime $t$.
@@ -53,16 +53,21 @@ keeps the total energy of the system constant (except for the lower boundaries),
 \begin{equation}
     z(r_0) \to z(r_0) + 1 \label{eqn:noncon_perturb}
 \end{equation}
-adds a unit of energy to a random point on the sandpile. The driven sandpile system is then simulated by specifying an initial configuration $z_0(r)$ and iterating through the following steps:
-% TODO: replace by pseudocode algorithm
-\begin{enumerate}
-    \item REPLACE BY PROPER PSEUDOCODE
-    \item Step 1: While $\exists r\in R:\, z_\tau(r) > z_c$: repeatedly apply relaxation steps until the sandpile settles in a stable state after $t$ steps.
-    \item Step 2: Choose a random $r_0\in R$.
-    \item Step 3: Perturb the system at $r_0$.
-    \item Step 4: Go to Step 1.
-\end{enumerate}
-Notice that the perturbations happen on a macroscopic time scale (the outer loop), while the relaxation steps are the microscopic evolution of the CA.
+adds a unit of energy to a random point on the sandpile. The driven sandpile system is then simulated by specifying an initial configuration $z_0(r)$ and iterating through the steps described in Algorithm \ref{alg:step}. Notice that the perturbations happen on a macroscopic time scale (the outer loop), while the relaxation steps are the microscopic evolution of the CA.
+\begin{algorithm}
+    \caption{Time evolution of a sandpile with a slow driving perturbation \cite{christensen1991dynamical}.}
+    \label{alg:step}
+    \KwIn{Initial sandpile state $z_0$, critical value $z_c$, number of macroscopic time steps $N_\mathrm{steps}$}
+    \KwOut{Final state after $N_\mathrm{steps}$ steps}
+
+    \For{$i=1$ \KwTo $N_\mathrm{steps}$}{
+        \While{$\exists r\in R:\, z_\tau(r) > z_c$}{
+            Apply relaxation $z_\tau(r) \to z_{\tau+1}(r)$ \;
+        }
+        Choose $r_0\in R$ randomly \;
+        Apply perturbation at $r_0$ \;
+    }
+\end{algorithm}
 
 After a transient period of $T$ macroscopic time steps, which we also call \emph{burn-in} phase, some sandpiles reach a stationary state. The burn-in time $T$ depends on the initial configuration of the system as well as the chosen boundary conditions and perturbations. There are also configurations, like the closed system with conservative perturbation, that do not reach a stationary state at all \cite{christensen1991dynamical}. In the stationary state, which we also call critical state, the average energy
 \begin{equation}
@@ -145,6 +150,17 @@ with
 To justify this measurement approach, we need to assume avalanche variables $X_i$ to be identically and independently distributed \cite{pruessner2012numerical}.
 % TODO: Elaborate
 %The former is the case in the critical state.
+
+After estimating the relevant probability density functions and expectation values from our measurements, we plot them on a log-log scale. Since
+\begin{align}
+    && P &= C\cdot x^a \nonumber \\
+    \iff&& \log_{10}(P) &= a\cdot\log_{10}(x) + C,
+\end{align}
+we can obtain the scaling exponent (with uncertainty) as the slope of a weighted linear least squares fit through the logarithmic data. We need to take into account the uncertainties of the input data
+\begin{equation}
+    \sigma_{\log_{10}P} = \frac{1}{10P}\sigma_p.
+\end{equation}
+In an infinite lattice, we would expect the probability densities to strictly obey a power law. However due to the constraints of a finite lattice, we deviate from a power law correspondence at very low and high values of the variable $x$. As a finite sized lattice cannot support avalanches of arbitrary sizes, the probability of measuring an avalanche size drops exponentially after a certain threshold, breaking the power law for large values. At very small scales, the self similarity and thus continuous scale-invariance of the system is not yet fulfilled, which also causes deviations from the power law \cite{pruessner2012scaling}. Hence, in order to measure the scaling exponents as accurately as possible, one needs to limit the input data for the linear fit toward a linear scaling region.
 
 The algorithms described above were implemented in Python. For efficient handling of multi-dimensional data we used the PyTorch \cite{paszke2019pytorch} library. All further data analysis was performed using NumPy \cite{harris2020array} for data manipulation and Matplotlib \cite{hunter2007matplotlib} for visualization. The source code used to generate all numerical results presented in the following sections is publicly available on GitHub at
 % TODO: Insert github link
