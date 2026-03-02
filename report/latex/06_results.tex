@@ -44,15 +44,38 @@ Before measurements can be taken, each system must undergo a burn-in phase in or
   \label{fig:N40d2_open_conservative_random_burn_in}
 \end{figure}
 
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.8\linewidth]{../../figures/burn_in_plots/N40d2_open_conservative_max_burn_in.png}
+  \caption{Burn-in of the mean slope $\langle z\rangle(\tau)$ for system B. The system is initialized with $z = z_c$ at all sites.}
+  \label{fig:N40d2_open_conservative_max_burn_in}
+\end{figure}
 
 
 
 
-Figures~\ref{fig:N40d2_open_nonconservative_zero_burn_in} and~\ref{fig:N40d2_open_conservative_zero_burn_in} show $\langle z\rangle(\tau)$ for configurations A and B when the system is initialized with $z=0$ at all sites. In both cases the approach to a stationary plateau is clearly visible. However, the conservative perturbation scheme (configuration B) requires a substantially longer transient. A plausible explanation is that, under conservative driving, the system effectively gains energy only through additions that occur at the boundary. This slows down the process of reaching the stationary state.
 
-To reduce the burn-in time, an alternative initialization was tested in which each site is assigned an independent random height in the interval $[0,z_c]$, i.e.\ $z \sim U(0,z_c)$. The resulting burn-in curve for configuration B is shown in Figure~\ref{fig:N40d2_open_conservative_random_burn_in}. Compared to the zero initialization, the system reaches the stationary regime significantly faster. For configuration A, the burn-in time does not change, as it is already minimal for the algorithm inroduced in the methods section.
 
-Based on this comparison, random initialization is used for all subsequent simulations and measurements. Burn-in times for all model configurations were then determined using this initialization scheme; the corresponding values are reported in Table~\ref{tab:burn_in_times}.
+Figures~\ref{fig:N40d2_open_nonconservative_zero_burn_in} and~\ref{fig:N40d2_open_conservative_zero_burn_in} show $\langle z\rangle(\tau)$ for configurations A and B when the system is initialized with $z=0$ at all sites. In both cases, the approach to a stationary plateau is clearly visible. However, the conservative perturbation scheme (configuration B) requires a substantially longer time to reach the stationary state.
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{l|cccccc}
+init/system & A & B & C & D & E & F \\
+\hline
+zero   & 50001 & 174000 & 52000 & 74000 & 449000 & 73000 \\
+max    & 50000 & 50000  & 50000 & 53000 & 93000  & 53000 \\
+random & 50000 & 76000  & 50000 & 54000 & 88000  & 53000 \\
+\end{tabular}
+\caption{Measured burn-in times (in driving steps) for configurations A--F under three different initialization schemes: all sites set to zero (zero), all sites set to the threshold height $z_c$ (max), and random initialization with $z \sim U(0,z_c)$ (random).}
+\label{tab:burn_in_times}
+\end{table}
+
+To reduce the burn-in time, two alternative initialization schemes are tested. In the first scheme, each site is assigned an independent random height in the interval $[0,z_c]$, i.e.\ $z \sim U(0,z_c)$. In the second scheme, the maximally stable configuration is used as the initial state, i.e.\ $z=z_c$ at all sites. The resulting burn-in curves for configuration B are shown in Figures~\ref{fig:N40d2_open_conservative_random_burn_in} and~\ref{fig:N40d2_open_conservative_max_burn_in}. Compared to the zero initialization, both schemes reach the stationary regime significantly faster. For configuration A, the burn-in time does not change appreciably, as it is already close to smalles possible burn in time resulting from the algorithm introduced in the methods section.
+
+Burn-in times for configurations A--F are measured for all three initialization schemes. The corresponding values are reported in Table~\ref{tab:burn_in_times}. For most configurations, the shortest burn-in time is obtained with the maximal initialization. All subsequent simulations and measurements therefore use this initialization scheme.
+
+
 
 
 
