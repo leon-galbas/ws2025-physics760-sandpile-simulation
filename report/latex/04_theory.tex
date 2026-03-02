@@ -4,7 +4,12 @@ Self-organized criticality can be studied through cellular automata. The specifi
 \subsection{The BTW sandpile automaton}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% TODO: Insert graph visualizing sandpile local slope analogy
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\linewidth]{../../figures/local_slope.png}
+    \caption{This illustration shows in a one-dimensional example, how the configuration $z(r)$ can be interpreted as the local slope of a sandpile with heights $h$ on the vertices between the lattice sites. Source: Pruessner 2012, Chapter 4.1 \cite{pruessner2012self}.}
+    \label{fig:local-slope}
+\end{figure}
 
 A sandpile of dimension $d$ and linear size $N$ is defined on the lattice
 \begin{equation}
@@ -14,7 +19,7 @@ The neighborhood $M_r$ of a lattice site $r\in R$ is defined as the set of the s
 \begin{equation}
     M_r := \{r\} \cap \{r \pm e_i \mid 1\leq i\leq d\},
 \end{equation}
-where $e_i$ is the lattice's $i$-th canonical unit vector. The configuration $z$ assigns an integer $z_\tau(r)\in\bZ$ to each lattice site $r$ at time $\tau$. Christensen et al. \cite{christensen1991dynamical} call this configuration the \emph{local slope} of the sandpile at time $\tau$, which is motivated by the physical analogy shown in Figure \ref{fig:local_slope}. Another, perhaps more universal, way is to think of $z$ as the \emph{local energy} of the system at a lattice site \cite{barrat1999fluctuations},\cite{markovic2014power}. We shall from now on stick to this analogy. Next, we define a critical threshold $z_c\in\bZ$. The sandpile is \emph{stable}, if at a given time step, $z(r) \leq z_c$ for all $r\in R$. Otherwise, the system is \emph{unstable}. The time evolution of the sandpile is then specified as follows.
+where $e_i$ is the lattice's $i$-th canonical unit vector. The configuration $z$ assigns an integer $z_\tau(r)\in\bZ$ to each lattice site $r$ at time $\tau$. Christensen et al. \cite{christensen1991dynamical} call this configuration the \emph{local slope} of the sandpile at time $\tau$, which is motivated by the physical analogy shown in Figure \ref{fig:local-slope}. Another, perhaps more universal, way is to think of $z$ as the \emph{local energy} of the system at a lattice site \cite{barrat1999fluctuations},\cite{markovic2014power}. We shall from now on stick to this analogy. Next, we define a critical threshold $z_c\in\bZ$. The sandpile is \emph{stable}, if at a given time step, $z(r) \leq z_c$ for all $r\in R$. Otherwise, the system is \emph{unstable}. The time evolution of the sandpile is then specified as follows.
 
 If the sandpile is stable, the local evolution leaves $z$ constant, i.e. $z_{\tau+1}(r) = z_\tau(r)$ for all $r$. Hence, without changing $z$ through an external perturbation, a stable sandpile does not change in time at all. For an unstable sandpile, let
 \begin{equation}
@@ -111,10 +116,10 @@ When the system is in a critical state, we expect the behavior of avalanche char
 where $\alpha,\tau,\lambda$ are scaling parameters to be determined. Note that the parameter $\tau$ here is different from the timestep $\tau$ used before. Additionally, we also expect the conditional expectation values of the avalanche parameters with respect to each other to obey the power laws
 \begin{align}
     \bE[S \mid T=t] &\propto t^{\gamma_1}, \nonumber \\
-    \bE[T \mid S=s] &\propto t^{1/\gamma_1}, \nonumber \\
-    \bE[S \mid L=l] &\propto t^{\gamma_2}, \nonumber \\
-    \bE[L \mid S=s] &\propto t^{1/\gamma_2}, \label{eqn:expvals} \\
-    \bE[T \mid L=l] &\propto t^{\gamma_3}, \nonumber \\
+    \bE[T \mid S=s] &\propto s^{1/\gamma_1}, \nonumber \\
+    \bE[S \mid L=l] &\propto l^{\gamma_2}, \nonumber \\
+    \bE[L \mid S=s] &\propto s^{1/\gamma_2}, \label{eqn:expvals} \\
+    \bE[T \mid L=l] &\propto l^{\gamma_3}, \nonumber \\
     \bE[L \mid T=t] &\propto t^{1/\gamma_3}. \nonumber
 \end{align}
 In the following, we want to perform numerical measurements and validate the emergence of power laws by statistically measuring the probability densities (Eq. (\ref{eqn:pdfs})) and expectation values (Eq. (\ref{eqn:expvals})) and calculate the respective scaling exponents.
