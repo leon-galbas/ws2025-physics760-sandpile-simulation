@@ -20,7 +20,7 @@ def compute_scaling_exponents(data: pd.DataFrame, window_size, window_step_size,
     exponents["tau"] = get_prob_exponent(s, window_size, window_step_size, r_thresh, k)
     exponents["alpha"] = get_prob_exponent(t, window_size, window_step_size, r_thresh, k)
     exponents["lambda"] = get_prob_exponent(l, window_size, window_step_size, r_thresh, k)
-
+    logging.info("Calculating conditional scaling exponents.")
     # Calculate exponents from conditional expectation values
     exponents["gamma_1"] = get_cond_exponent(t, s, window_size, window_step_size, r_thresh, k)
     exponents["inv_gamma_1"] = get_cond_exponent(s, t, window_size, window_step_size, r_thresh, k)
@@ -30,7 +30,7 @@ def compute_scaling_exponents(data: pd.DataFrame, window_size, window_step_size,
 
     exponents["gamma_3"] = get_cond_exponent(l, t, window_size, window_step_size, r_thresh, k)
     exponents["inv_gamma_3"] = get_cond_exponent(t, l, window_size, window_step_size, r_thresh, k)
-
+    
     #logging.info(f"Calculated exponents:\n{exponents}")
     return exponents
 
@@ -60,7 +60,9 @@ def get_prob_exponent(x: np.ndarray, window_size, window_step_size, r_thresh, k)
     # Do a linear log-log-fit
     log_x = np.log10(x)
     log_P = np.log10(P)
+
     lower, upper =get_scaling_window(log_x, log_P, window_size, window_step_size, r_thresh, k)
+
     fit = linregress(log_x[lower:upper], log_P[lower:upper])
     exp = fit.slope
     std_err = fit.stderr
@@ -76,6 +78,7 @@ def get_prob_exponent(x: np.ndarray, window_size, window_step_size, r_thresh, k)
     "lower": lower,
     "upper": upper,
     }
+
     values = np.array([log_x, log_P])
     return values, parms
 

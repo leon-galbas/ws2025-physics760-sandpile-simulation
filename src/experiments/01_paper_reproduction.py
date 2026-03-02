@@ -51,5 +51,5 @@ parms = product(
     hyperparameters["boundary_conditions"],
     hyperparameters["perturbations"],
 )
-with Pool() as pool:          # defaults to number of CPU cores
+with Pool() as pool:          
         pool.starmap(run, parms)
