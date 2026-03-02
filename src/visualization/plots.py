@@ -127,7 +127,7 @@ def plot_scaling_exponents(
         sig = decimals_from_err(parms["std_err"])
         # print(f"{sig=}")
         data[latex_conv_table[key]] = (
-            f"$ ({parms['exponent']:.{sig + 11}f}"
+            f"$ ({parms['exponent']:.{sig + 1}f}"
             + r"\pm"
             + f"{parms['std_err']:.{sig + 1}f}) $"
         )
