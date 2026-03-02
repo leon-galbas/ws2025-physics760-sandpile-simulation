@@ -93,6 +93,6 @@ To determine a suitable fitting window in a reproducible way, a rolling-window p
 \end{equation}
 A window pair is classified as stable if the slope variation is statistically compatible with zero, $d_i < k\cdot\Delta d_i$, and if both fits satisfy $r_i^2 \ge r_{\mathrm{thresh}}$ and $r_{i+1}^2 \ge r_{\mathrm{thresh}}$, where $k$ is a chosen deviation factor and $r_{\mathrm{thresh}}$ is a minimum fit-quality threshold. The final fitting interval is obtained by selecting the longest contiguous stable region and using its corresponding lower and upper boundaries for the exponent regression. At this point it is important to note that the procedure described above is heuristic and does not yield a exact or unique scaling windows. The parameters $k$ and $r_{\mathrm{thresh}}$, as well as the window size, are tuned manually and can vary between model configurations.
 
-\paragraph{Implementation: }
+\section*{Implementation}
 The algorithms described above were implemented in Python. For efficient handling of multi-dimensional data we used the PyTorch \cite{paszke2019pytorch} library. All further data analysis was performed using NumPy \cite{harris2020array} for data manipulation and Matplotlib \cite{hunter2007matplotlib} for visualization. The source code used to generate all numerical results presented in the following sections is publicly available on GitHub at
 % TODO: Insert github link
