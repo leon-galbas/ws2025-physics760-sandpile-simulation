@@ -10,8 +10,42 @@ def linear_func(x, m, b):
     return m * x + b
 
 
+def estimate_systematic_window_error(x, y, sigma, lower, upper, max_variation=3):
+    """
+    Estimates systematic error by perturbing the heuristic window boundaries
+    and computing the standard deviation of the resulting fit slopes.
+    """
+    slopes = []
+
+    # Constrain variations to array boundaries
+    l_min = max(0, lower - max_variation)
+    l_max = min(len(x) - 3, lower + max_variation)
+    u_min = max(3, upper - max_variation)
+    u_max = min(len(x), upper + max_variation)
+
+    for l in range(l_min, l_max + 1):
+        for u in range(u_min, u_max + 1):
+            # Ensure sufficient points for a meaningful fit
+            if u - l >= 3:
+                try:
+                    popt, _ = curve_fit(
+                        linear_func,
+                        x[l:u],
+                        y[l:u],
+                        sigma=sigma[l:u],
+                        absolute_sigma=True,
+                    )
+                    slopes.append(popt[0])
+                except RuntimeError:
+                    continue
+
+    if len(slopes) > 1:
+        return np.std(slopes, ddof=1)
+    return 0.0
+
+
 def compute_scaling_exponents(
-    data: pd.DataFrame, window_size, window_step_size, r_thresh, k, manuel_bounds= {}
+    data: pd.DataFrame, window_size, window_step_size, r_thresh, k, manuel_bounds={}
 ):
 
     s = np.asarray(data["s"], dtype=np.int64)
@@ -21,13 +55,14 @@ def compute_scaling_exponents(
     logging.info("Calculating scaling exponents.")
 
     # Calculate exponents from probability densities
-    
-    man_key= list(manuel_bounds.keys()) 
+
+    man_key = list(manuel_bounds.keys())
+
     def _bounds_for(name: str):
         return manuel_bounds.get(name) if name in man_key else None
-    
+
     exponents["tau"] = get_prob_exponent(
-    s, window_size, window_step_size, r_thresh, k, bounds=_bounds_for("tau")
+        s, window_size, window_step_size, r_thresh, k, bounds=_bounds_for("tau")
     )
 
     exponents["alpha"] = get_prob_exponent(
@@ -44,21 +79,39 @@ def compute_scaling_exponents(
         t, s, window_size, window_step_size, r_thresh, k, bounds=_bounds_for("gamma_1")
     )
     exponents["inv_gamma_1"] = get_cond_exponent(
-        s, t, window_size, window_step_size, r_thresh, k, bounds=_bounds_for("inv_gamma_1")
+        s,
+        t,
+        window_size,
+        window_step_size,
+        r_thresh,
+        k,
+        bounds=_bounds_for("inv_gamma_1"),
     )
 
     exponents["gamma_2"] = get_cond_exponent(
         l, s, window_size, window_step_size, r_thresh, k, bounds=_bounds_for("gamma_2")
     )
     exponents["inv_gamma_2"] = get_cond_exponent(
-        s, l, window_size, window_step_size, r_thresh, k, bounds=_bounds_for("inv_gamma_2")
+        s,
+        l,
+        window_size,
+        window_step_size,
+        r_thresh,
+        k,
+        bounds=_bounds_for("inv_gamma_2"),
     )
 
     exponents["gamma_3"] = get_cond_exponent(
         l, t, window_size, window_step_size, r_thresh, k, bounds=_bounds_for("gamma_3")
     )
     exponents["inv_gamma_3"] = get_cond_exponent(
-        t, l, window_size, window_step_size, r_thresh, k, bounds=_bounds_for("inv_gamma_3")
+        t,
+        l,
+        window_size,
+        window_step_size,
+        r_thresh,
+        k,
+        bounds=_bounds_for("inv_gamma_3"),
     )
 
     # logging.info(f"Calculated exponents:\n{exponents}")
@@ -95,11 +148,11 @@ def get_prob_exponent(
     log_x = np.log10(x)
     log_P = np.log10(P)
     log_P_err = P_err / (10 * P)
-    if bounds == None: 
+    if bounds == None:
         lower, upper = get_scaling_window(
             log_x, log_P, window_size, window_step_size, r_thresh, k
         )
-    else: 
+    else:
         lower, upper = bounds
 
     popt, pcov = curve_fit(
@@ -110,7 +163,14 @@ def get_prob_exponent(
         absolute_sigma=True,
     )
     exp, intercept = popt
-    std_err, intercept_stderr = np.sqrt(np.diag(pcov))
+    std_err_stat = np.sqrt(np.diag(pcov))[0]
+    intercept_stderr = np.sqrt(np.diag(pcov))[1]
+
+    std_err_sys = estimate_systematic_window_error(
+        log_x, log_P, log_P_err, lower, upper
+    )
+
+    std_err = np.sqrt(std_err_stat**2 + std_err_sys**2)
 
     parms = {
         "exponent": 1 - exp,
@@ -126,7 +186,13 @@ def get_prob_exponent(
 
 
 def get_cond_exponent(
-    x: np.ndarray, y: np.ndarray, window_size, window_step_size, r_thresh, k, bounds= None
+    x: np.ndarray,
+    y: np.ndarray,
+    window_size,
+    window_step_size,
+    r_thresh,
+    k,
+    bounds=None,
 ) -> tuple[float, float]:
     """Calculate conditional expectation value scaling exponents.
 
@@ -183,11 +249,11 @@ def get_cond_exponent(
     # 3. Propagate errors to logarithmic space
     sigma_log_E = sigma_E_val / (10 * E_val)
 
-    if bounds == None: 
+    if bounds == None:
         lower, upper = get_scaling_window(
             log_y, log_E, window_size, window_step_size, r_thresh, k
         )
-    else: 
+    else:
         lower, upper = bounds
     popt, pcov = curve_fit(
         f=linear_func,
@@ -197,7 +263,14 @@ def get_cond_exponent(
         absolute_sigma=True,
     )
     exp, intercept = popt
-    std_err, intercept_stderr = np.sqrt(np.diag(pcov))
+    std_err_stat = np.sqrt(np.diag(pcov))[0]
+    intercept_stderr = np.sqrt(np.diag(pcov))[1]
+
+    std_err_sys = estimate_systematic_window_error(
+        log_y, log_E, sigma_log_E, lower, upper
+    )
+
+    std_err = np.sqrt(std_err_stat**2 + std_err_sys**2)
 
     # parameters relevant for plotting
     parms = {
