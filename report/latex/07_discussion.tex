@@ -12,3 +12,70 @@ A reasonable explanation is that, with our boundary conditions, conservative per
 The long burn-in in model B is mainly due to how slowly the system fills up when starting from $z_0=0$. A direct way to shorten it is to start closer to the stationary energy density. This motivates the alternative initial conditions: random initialization $z_0\sim U(0,z_c)$ and maximally stable initialization $z_0=z_c$. Both preload the lattice with energy, so fewer driving steps are needed before $\langle z\rangle(\tau)$ stops drifting.
 
 These initial conditions also reduce the time spent in a clearly nonstationary regime, where avalanches are not representative of the steady state. The benefit is largest for conservative driving, where the fill-up stage is slowest. For cases that equilibrate quickly, the burn-in time still cannot drop below the built-in minimum $T_{\min}$ set by the stationarity check procedure.
+
+\subsection{Scaling exponent measurements and comparison to literature}
+After preparing each system in Table~\ref{tab:model_configurations} in the
+critical state, we measure the avalanche observables $t$, $s$ and $l$.
+From these measurements we estimate the PDFs and fit power laws in the
+scaling region (see the example fits in Fig.~\ref{fig:pdf-plot-example}).
+
+On the double-logarithmic PDF plots, the scaling region appears as an
+approximately straight line. At small $t,s,l$ we do not expect perfect
+scaling because of discretization effects and because avalanches are still
+``small''. At large $t,s,l$ we see a cutoff due to finite system size and
+limited statistics (especially for the $d=4$ systems in
+Table~\ref{tab:model_configurations}, where we used fewer measurements).
+Because of these effects, the choice of the fitting window has a direct
+impact on the fitted slope (as visible in Fig.~\ref{fig:pdf-plot-example}).
+
+
+The fitted PDF exponents for the open nonconservative systems (configs
+A, D, G) are listed in Table~\ref{tab:scaling_exp_open_nonconservative}.
+The corresponding results for the open conservative systems (configs
+B, E, H) are given in Table~\ref{tab:scaling_exp_open_conservative}, and for
+the closed nonconservative systems (configs C, F, I) in
+Table~\ref{tab:scaling_exp_closed_nonconservative}.
+Overall, the fitted values follow the expected trend with dimension: the
+distributions become steeper with increasing $d$, and the scaling window is
+typically shorter in higher dimensions, which increases the fit uncertainty.
+This is most visible for the $l$-fits (the exponent $\lambda$), where the
+cutoff sets in early and the statistics at large $l$ are weaker.
+
+Comparing boundary conditions for the nonconservative perturbation (open:
+Table~\ref{tab:scaling_exp_open_nonconservative} vs.\ closed:
+Table~\ref{tab:scaling_exp_closed_nonconservative}), the exponents are
+similar within the uncertainties. This suggests that changing open to closed
+boundaries does not strongly change the bulk scaling, as long as avalanches
+can still dissipate energy by the chosen dynamics.
+
+Comparing perturbation schemes at open boundaries (nonconservative:
+Table~\ref{tab:scaling_exp_open_nonconservative} vs.\ conservative:
+Table~\ref{tab:scaling_exp_open_conservative}), we observe systematic shifts
+in the fitted exponents. In particular, the conservative perturbation tends
+to give steeper PDFs, which means very large avalanches are relatively less
+likely in that setup.
+
+
+The conditional expectation value fits are illustrated in
+Fig.~\ref{fig:cond-plot-example}. The measured conditional exponents for the
+open nonconservative systems are summarized in
+Table~\ref{tab:scaling_exp_open_nonconservative_gamma}, for open
+conservative in Table~\ref{tab:scaling_exp_open_conservative_gamma}, and for
+closed nonconservative in Table~\ref{tab:scaling_exp_closed_nonconservative_gamma}.
+In general, the relations involving $s$ and $t$ show the most stable scaling
+regions, while relations that involve $l$ tend to have larger uncertainties.
+A simple reason is that large-$l$ events are rare, so conditional averages
+at large conditioning values have larger noise, and the fitted slope depends
+more on the exact window choice (as also visible in
+Fig.~\ref{fig:cond-plot-example}).
+
+
+The reference values reported by Christensen et al.\ can be compared
+directly to our fitted exponents in
+Tables~\ref{tab:scaling_exp_open_nonconservative}--\ref{tab:scaling_exp_closed_nonconservative_gamma}.
+Overall, our results show the same qualitative trends with dimension and
+with the choice of perturbation/boundary conditions. Remaining differences
+are expected from finite-size effects, the limited scaling window, and the
+fact that exponent estimates depend on the fitting procedure and on the
+chosen range (see Fig.~\ref{fig:pdf-plot-example} and
+Fig.~\ref{fig:cond-plot-example}).
