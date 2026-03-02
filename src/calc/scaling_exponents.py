@@ -11,7 +11,7 @@ def linear_func(x, m, b):
 
 
 def compute_scaling_exponents(
-    data: pd.DataFrame, window_size, window_step_size, r_thresh, k
+    data: pd.DataFrame, window_size, window_step_size, r_thresh, k, manuel_bounds= {}
 ):
 
     s = np.asarray(data["s"], dtype=np.int64)
@@ -21,34 +21,44 @@ def compute_scaling_exponents(
     logging.info("Calculating scaling exponents.")
 
     # Calculate exponents from probability densities
-    exponents["tau"] = get_prob_exponent(s, window_size, window_step_size, r_thresh, k)
+    
+    man_key= list(manuel_bounds.keys()) 
+    def _bounds_for(name: str):
+        return manuel_bounds.get(name) if name in man_key else None
+    
+    exponents["tau"] = get_prob_exponent(
+    s, window_size, window_step_size, r_thresh, k, bounds=_bounds_for("tau")
+    )
+
     exponents["alpha"] = get_prob_exponent(
-        t, window_size, window_step_size, r_thresh, k
+        t, window_size, window_step_size, r_thresh, k, bounds=_bounds_for("alpha")
     )
+
     exponents["lambda"] = get_prob_exponent(
-        l, window_size, window_step_size, r_thresh, k
+        l, window_size, window_step_size, r_thresh, k, bounds=_bounds_for("lambda")
     )
+
     logging.info("Calculating conditional scaling exponents.")
     # Calculate exponents from conditional expectation values
     exponents["gamma_1"] = get_cond_exponent(
-        t, s, window_size, window_step_size, r_thresh, k
+        t, s, window_size, window_step_size, r_thresh, k, bounds=_bounds_for("gamma_1")
     )
     exponents["inv_gamma_1"] = get_cond_exponent(
-        s, t, window_size, window_step_size, r_thresh, k
+        s, t, window_size, window_step_size, r_thresh, k, bounds=_bounds_for("inv_gamma_1")
     )
 
     exponents["gamma_2"] = get_cond_exponent(
-        l, s, window_size, window_step_size, r_thresh, k
+        l, s, window_size, window_step_size, r_thresh, k, bounds=_bounds_for("gamma_2")
     )
     exponents["inv_gamma_2"] = get_cond_exponent(
-        s, l, window_size, window_step_size, r_thresh, k
+        s, l, window_size, window_step_size, r_thresh, k, bounds=_bounds_for("inv_gamma_2")
     )
 
     exponents["gamma_3"] = get_cond_exponent(
-        l, t, window_size, window_step_size, r_thresh, k
+        l, t, window_size, window_step_size, r_thresh, k, bounds=_bounds_for("gamma_3")
     )
     exponents["inv_gamma_3"] = get_cond_exponent(
-        t, l, window_size, window_step_size, r_thresh, k
+        t, l, window_size, window_step_size, r_thresh, k, bounds=_bounds_for("inv_gamma_3")
     )
 
     # logging.info(f"Calculated exponents:\n{exponents}")
@@ -56,7 +66,7 @@ def compute_scaling_exponents(
 
 
 def get_prob_exponent(
-    x: np.ndarray, window_size, window_step_size, r_thresh, k
+    x: np.ndarray, window_size, window_step_size, r_thresh, k, bounds=None
 ) -> tuple[float, float]:
     """Calculate probability density scaling exponent.
 
@@ -85,10 +95,12 @@ def get_prob_exponent(
     log_x = np.log10(x)
     log_P = np.log10(P)
     log_P_err = P_err / (10 * P)
-
-    lower, upper = get_scaling_window(
-        log_x, log_P, window_size, window_step_size, r_thresh, k
-    )
+    if bounds == None: 
+        lower, upper = get_scaling_window(
+            log_x, log_P, window_size, window_step_size, r_thresh, k
+        )
+    else: 
+        lower, upper = bounds
 
     popt, pcov = curve_fit(
         linear_func,
@@ -114,7 +126,7 @@ def get_prob_exponent(
 
 
 def get_cond_exponent(
-    x: np.ndarray, y: np.ndarray, window_size, window_step_size, r_thresh, k
+    x: np.ndarray, y: np.ndarray, window_size, window_step_size, r_thresh, k, bounds= None
 ) -> tuple[float, float]:
     """Calculate conditional expectation value scaling exponents.
 
@@ -171,9 +183,12 @@ def get_cond_exponent(
     # 3. Propagate errors to logarithmic space
     sigma_log_E = sigma_E_val / (10 * E_val)
 
-    lower, upper = get_scaling_window(
-        log_y, log_E, window_size, window_step_size, r_thresh, k
-    )
+    if bounds == None: 
+        lower, upper = get_scaling_window(
+            log_y, log_E, window_size, window_step_size, r_thresh, k
+        )
+    else: 
+        lower, upper = bounds
     popt, pcov = curve_fit(
         f=linear_func,
         xdata=log_y[lower:upper],
