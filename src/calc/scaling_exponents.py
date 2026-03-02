@@ -157,8 +157,10 @@ def get_cond_exponent(
     sigma_E[N_y <= 1] = np.nan
 
     # DO fit
-    valid = (y > 0) & (E > 0) & np.isfinite(E) & (sigma_E > 0) & np.isfinite(sigma_E)
-    y_val = y[valid]
+    valid = (
+        (unique_y > 0) & (E > 0) & np.isfinite(E) & (sigma_E > 0) & np.isfinite(sigma_E)
+    )
+    y_val = unique_y[valid]
     E_val = E[valid]
     sigma_E_val = sigma_E[valid]
 
