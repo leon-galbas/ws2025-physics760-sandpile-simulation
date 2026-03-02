@@ -3,6 +3,9 @@ import logging
 import numpy as np
 import pandas as pd
 from scipy.stats import linregress
+import torch
+from torch.optim import Optimizer
+
 
 
 def compute_scaling_exponents(data: pd.DataFrame, window_size, window_step_size, r_thresh, k):
