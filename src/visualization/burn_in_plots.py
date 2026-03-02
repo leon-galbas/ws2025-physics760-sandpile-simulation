@@ -1,24 +1,40 @@
-import polars as pl
+import matplotlib as mpl
 import matplotlib.pyplot as plt
+import polars as pl
+
+mpl.rcParams.update(
+    {
+        "figure.figsize": (3.4, 2.4),
+        "font.size": 9,
+        "axes.labelsize": 9,
+        "xtick.labelsize": 8,
+        "ytick.labelsize": 8,
+        "legend.fontsize": 6,
+        "lines.linewidth": 1.0,
+        "axes.linewidth": 0.8,
+        "xtick.direction": "in",
+        "ytick.direction": "in",
+    }
+)
+
 path = "data/burn_in_stats.pq"
 
 df = pl.read_parquet(path)
 print(df)
 
-for i in range (df.height):
-    row= df[i]
+for i in range(df.height):
+    row = df[i]
     print(row)
     N = row["N"][0]
     d = row["d"][0]
     init = row["init"][0]
     boundary_condition = row["boundary"][0]
     perturbation = row["perturb"][0]
-    z_mean_hist = row["z_mean_hist"][0] 
-    bit= row["burn_in_time"][0]
+    z_mean_hist = row["z_mean_hist"][0]
+    bit = row["burn_in_time"][0]
     model_name = f"N{N}d{d}_{boundary_condition}_{perturbation}_{init}"
     plt.plot(range(len(z_mean_hist)), z_mean_hist)
-    plt.xlabel(r"$\tau$",fontsize=20)
-    plt.ylabel(r"$\langle z\rangle (\tau)$", fontsize=20)
-    plt.savefig(f"figures/burn_in_plots/{model_name}_burn_in.png", dpi=300)
+    plt.xlabel(r"$\tau$")  # ,fontsize=20)
+    plt.ylabel(r"$\langle z\rangle (\tau)$")  # , fontsize=20)
+    plt.savefig(f"figures/burn_in_plots/{model_name}_burn_in.pdf", bbox_inches="tight")
     plt.clf()
-    
