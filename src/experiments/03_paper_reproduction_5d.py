@@ -9,10 +9,10 @@ from src.utils import read_config
 hyperparameters = dict(
     dims=[(15, 5), (10, 6)],
     boundary_conditions=["open"],
-    perturbations=["conservative", "nonconservative"],
+    perturbations=["conservative"],
 )
 
-n_measure = 1e4  # 5e5
+n_measure = 1e5  # 5e5
 
 model_name_5 = "N15d5_open_conservative copy.pkl"
 model_name_6 = "N10d6_open_conservative copy.pkl"
