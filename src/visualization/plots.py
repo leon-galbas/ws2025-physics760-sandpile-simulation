@@ -2,12 +2,28 @@ import logging
 import math
 import os
 
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
 from src.calc.scaling_exponents import *
 from src.model.io import *
+
+mpl.rcParams.update(
+    {
+        "figure.figsize": (3.4, 2.4),
+        "font.size": 9,
+        "axes.labelsize": 9,
+        "xtick.labelsize": 8,
+        "ytick.labelsize": 8,
+        "legend.fontsize": 6,
+        "lines.linewidth": 1.0,
+        "axes.linewidth": 0.8,
+        "xtick.direction": "in",
+        "ytick.direction": "in",
+    }
+)
 
 model_id = {
     "N40d2_open_nonconservative": "A",
@@ -107,21 +123,35 @@ def plot_scaling_exponents(
 
         if key in ["tau", "alpha", "lambda"]:
             lin_regress_y = lin_regress_x * (1 - parms["exponent"]) + parms["intercept"]
+            fitlabel = (
+                "WLS fit\n"
+                + r"$m=$"
+                + f"{(1 - parms['exponent']):.4f}\n"
+                + r"$\Delta m=$"
+                + f"{parms['std_err']:.4f}"
+            )
         else:
             lin_regress_y = lin_regress_x * parms["exponent"] + parms["intercept"]
+            fitlabel = (
+                "WLS fit\n"
+                + r"$m=$"
+                + f"{parms['exponent']:.4f}\n"
+                + r"$\Delta m=$"
+                + f"{parms['std_err']:.4f}"
+            )
 
-        plt.plot(lin_regress_x, lin_regress_y, label="WLS fit")
+        plt.plot(lin_regress_x, lin_regress_y, label=fitlabel)
         plt.axvline(
             values[0][parms["lower"]],
             linestyle=":",
-            linewidth=2,
+            # linewidth=2,
             label="fitting window",
         )
         plt.axvline(values[0][parms["upper"]], linestyle=":", linewidth=2)
         plt.legend()
-        plt.xlabel(x_label_conv_table[key], fontsize="18")
-        plt.ylabel(label_conv_table[key], fontsize="18")
-        plt.savefig(f"{plot_path}/{model_name}_{key}.png", dpi=300)
+        plt.xlabel(x_label_conv_table[key])  # , fontsize="18")
+        plt.ylabel(label_conv_table[key])  # , fontsize="18")
+        plt.savefig(f"{plot_path}/{model_name}_{key}.pdf", bbox_inches="tight")
         plt.clf()
         data["model"] = model_id[model_name]
         sig = decimals_from_err(parms["std_err"])
