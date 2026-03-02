@@ -1,97 +1,98 @@
-We simulate and analyse the sandpile model for a range of parameter choices and for large measurement counts $n$, as described in the previous chapter. All simulated parameter configurations are summarised in Table~\ref{tab:model_configurations}. For ease of reference, each configuration is assigned a letter label, which is used throughout the remainder of this work.
+We simulate and analyze the sandpile model for a range of parameter choices and for large measurement counts $N_{\text{measure}}$, as described in the previous chapter. All simulated parameter configurations are summarized in Table \ref{tab:model_configurations}. For ease of reference, each configuration is assigned a letter label, which is used throughout the remainder of this work.
 
-\begin{table}[h!]
-\centering
-\begin{tabular}{lccccc}
-\hline
-config & $d$ & $N$ & boundary condition & perturbation & $n$ \\
-\hline
-A & 2 & 40 & open   & nonconservative & $10^7$ \\
-B & 2 & 40 & open   & conservative    & $10^7$ \\
-C & 2 & 40 & closed & nonconservative & $10^7$ \\
-D & 3 & 20 & open   & nonconservative & $10^7$ \\
-E & 3 & 20 & open   & conservative    & $10^7$ \\
-F & 3 & 20 & closed & nonconservative & $10^7$ \\
-G & 4 & 20 & open   & nonconservative & $10^7$ \\
-H & 4 & 20 & open   & conservative    & $10^7$ \\
-I & 4 & 20 & closed & nonconservative & $10^7$ \\
-\hline
-\end{tabular}
-\caption{Simulated model configurations and measurement counts used in this work.}
-\label{tab:model_configurations}
+\begin{table}[ht!]
+  \centering
+  \begin{tabular}{lccccc}
+    \hline
+    config & $d$ & $N$ & boundary condition & perturbation & $n$ \\
+    \hline
+    A & 2 & 40 & open   & nonconservative & $10^7$ \\
+    B & 2 & 40 & open   & conservative    & $10^7$ \\
+    C & 2 & 40 & closed & nonconservative & $10^7$ \\
+    D & 3 & 20 & open   & nonconservative & $10^7$ \\
+    E & 3 & 20 & open   & conservative    & $10^7$ \\
+    F & 3 & 20 & closed & nonconservative & $10^7$ \\
+    G & 4 & 20 & open   & nonconservative & $10^7$ \\
+    H & 4 & 20 & open   & conservative    & $10^7$ \\
+    I & 4 & 20 & closed & nonconservative & $10^7$ \\
+    \hline
+  \end{tabular}
+  \caption{Simulated model configurations and measurement counts used in this work.}
+  \label{tab:model_configurations}
 \end{table}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Choice of burn-in strategy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Before measurements can be taken, each system must undergo a burn-in phase in order to reach a stationary state. The burn-in procedure is applied as described in the previous section and is monitored using the mean slope $\langle z\rangle(\tau)$ as a function of time $\tau$.
-\begin{figure}[h!]
+The burn-in procedure is applied as described in Section \ref{sec:burn-in} and is monitored using $\langle z\rangle(\tau)$ as a function of time $\tau$.
+
+\begin{figure}[!ht]
   \centering
-  \includegraphics[width=0.8\linewidth]{../../figures/burn_in_plots/N40d2_open_nonconservative_zero_burn_in.png}
-  \caption{Burn-in of the mean slope $\langle z\rangle(\tau)$ for system A. The system is initialized with $z=0$ at all sites.}
-  \label{fig:N40d2_open_nonconservative_zero_burn_in}
+
+  \begin{subfigure}{\columnwidth}
+    \centering
+    \includegraphics[width=0.8\linewidth]{../../figures/burn_in_plots/N40d2_open_nonconservative_zero_burn_in.png}
+    \caption{System A.}
+    \label{fig:N40d2_open_nonconservative_zero_burn_in}
+  \end{subfigure}
+
+  \begin{subfigure}{\columnwidth}
+    \centering
+    \includegraphics[width=0.8\linewidth]{../../figures/burn_in_plots/N40d2_open_conservative_zero_burn_in.png}
+    \caption{System B.}
+    \label{fig:N40d2_open_conservative_zero_burn_in}
+  \end{subfigure}
+
+  \caption{Burn-in of the mean slope $\langle z\rangle(\tau)$ for systems A and B as a function of $\tau$. The system is initialized with $z=0$ at all sites.}
+  \label{fig:burn-in-comparison-zero}
 \end{figure}
 
-\begin{figure}[h!]
+Figures \ref{fig:burn-in-comparison-zero} shows $\langle z\rangle(\tau)$ for configurations A and B when the system is initialized with $z=0$ at all sites. In both cases, the approach to a stationary plateau is clearly visible. However, the conservative perturbation scheme (configuration B) requires a substantially longer time to reach the stationary state.
+
+\begin{table}[ht!]
   \centering
-  \includegraphics[width=0.8\linewidth]{../../figures/burn_in_plots/N40d2_open_conservative_zero_burn_in.png}
-  \caption{Burn-in of the mean slope $\langle z\rangle(\tau)$ for system B. The system is initialized with $z=0$ at all sites.}
-  \label{fig:N40d2_open_conservative_zero_burn_in}
-\end{figure}
-
-\begin{figure}[h!]
-  \centering
-  \includegraphics[width=0.8\linewidth]{../../figures/burn_in_plots/N40d2_open_conservative_random_burn_in.png}
-  \caption{Burn-in of the mean slope $\langle z\rangle(\tau)$ for system B. The system is initialized with $z \sim U(0,z_c)$ at all sites.}
-  \label{fig:N40d2_open_conservative_random_burn_in}
-\end{figure}
-
-\begin{figure}[h!]
-  \centering
-  \includegraphics[width=0.8\linewidth]{../../figures/burn_in_plots/N40d2_open_conservative_max_burn_in.png}
-  \caption{Burn-in of the mean slope $\langle z\rangle(\tau)$ for system B. The system is initialized with $z = z_c$ at all sites.}
-  \label{fig:N40d2_open_conservative_max_burn_in}
-\end{figure}
-
-
-
-
-
-
-Figures~\ref{fig:N40d2_open_nonconservative_zero_burn_in} and~\ref{fig:N40d2_open_conservative_zero_burn_in} show $\langle z\rangle(\tau)$ for configurations A and B when the system is initialized with $z=0$ at all sites. In both cases, the approach to a stationary plateau is clearly visible. However, the conservative perturbation scheme (configuration B) requires a substantially longer time to reach the stationary state.
-
-\begin{table}[h!]
-\centering
-\begin{tabular}{l|cccccc}
-init/system & A & B & C & D & E & F \\
-\hline
-zero   & 50001 & 174000 & 52000 & 74000 & 449000 & 73000 \\
-max    & 50000 & 50000  & 50000 & 53000 & 93000  & 53000 \\
-random & 50000 & 76000  & 50000 & 54000 & 88000  & 53000 \\
-\end{tabular}
-\caption{Measured burn-in times (in driving steps) for configurations A--F under three different initialization schemes: all sites set to zero (zero), all sites set to the threshold height $z_c$ (max), and random initialization with $z \sim U(0,z_c)$ (random).}
-\label{tab:burn_in_times}
+  \begin{tabular}{l|cccccc}
+    init/system & A & B & C & D & E & F \\
+    \hline
+    zero   & 50001 & 174000 & 52000 & 74000 & 449000 & 73000 \\
+    max    & 50000 & 50000  & 50000 & 53000 & 93000  & 53000 \\
+    random & 50000 & 76000  & 50000 & 54000 & 88000  & 53000 \\
+  \end{tabular}
+  \caption{Measured burn-in times (in driving steps) for configurations A--F under three different initialization schemes: all sites set to zero (zero), all sites set to the threshold height $z_c$ (max), and random initialization with $z \sim U(0,z_c)$ (random).}
+  \label{tab:burn_in_times}
 \end{table}
 
-To reduce the burn-in time, two alternative initialization schemes are tested. In the first scheme, each site is assigned an independent random height in the interval $[0,z_c]$, i.e.\ $z \sim U(0,z_c)$. In the second scheme, the maximally stable configuration is used as the initial state, i.e.\ $z=z_c$ at all sites. The resulting burn-in curves for configuration B are shown in Figures~\ref{fig:N40d2_open_conservative_random_burn_in} and~\ref{fig:N40d2_open_conservative_max_burn_in}. Compared to the zero initialization, both schemes reach the stationary regime significantly faster. For configuration A, the burn-in time does not change appreciably, as it is already close to smalles possible burn in time resulting from the algorithm introduced in the methods section.
+\begin{figure}[!ht]
+  \centering
 
-Burn-in times for configurations A--F are measured for all three initialization schemes. The corresponding values are reported in Table~\ref{tab:burn_in_times}. For most configurations, the shortest burn-in time is obtained with the maximal initialization. All subsequent simulations and measurements therefore use this initialization scheme.
+  \begin{subfigure}{\columnwidth}
+    \centering
+    \includegraphics[width=0.8\linewidth]{../../figures/burn_in_plots/N40d2_open_conservative_random_burn_in.png}
+    \caption{Initialized to $z_0 \sim U(0,z_c)$ at all sites.}
+    \label{fig:N40d2_open_conservative_random_burn_in}
+  \end{subfigure}
+
+  \begin{subfigure}{\columnwidth}
+    \centering
+    \includegraphics[width=0.8\linewidth]{../../figures/burn_in_plots/N40d2_open_conservative_max_burn_in.png}
+    \caption{Initialized to $z_0 = z_c$ at all sites.}
+    \label{fig:N40d2_open_conservative_max_burn_in}
+  \end{subfigure}
+
+  \caption{Burn-in of $\langle z\rangle(\tau)$ as a functions of $\tau$ for system B with different initialization strategies.}
+  \label{fig:burn-in-comparison-init}
+\end{figure}
+
+Especially for subsequent measurements in higher dimensions, it is crucial to try to reduce the burn-in time and traverse towards the stationary state in as few steps as possible. To do this, two alternative initialization schemes are tested, as described in Section \ref{sec:burn-in}. The resulting burn-in curves for configuration B are shown in Figure \ref{fig:burn-in-comparison-init}. Compared to the zero initialization, both schemes reach the stationary regime significantly faster. For configuration A, the burn-in time does not change appreciably, as it is already close to smallest possible burn-in time resulting from the algorithm introduced in the methods section.
+
+Burn-in times for configurations A--F are measured for all three initialization schemes. The corresponding values are reported in Table \ref{tab:burn_in_times}. For most configurations, the shortest burn-in time is obtained with the maximal initialization. All subsequent simulations and measurements therefore use this initialization scheme.
+
+<<<<<<< HEAD
 
 
-
-
-
-To extract scaling exponents and the corresponding power-law prefactors, probability distribution functions (PDFs) are computed as described in the previous chapter and evaluated on log-log axes. In such a representation, power-law behaviour appears approximately linear, with the slope corresponding to the scaling exponent. The exponent is therefore estimated by linear regression in the scaling regime. Deviations from linearity are expected both at small values (discreteness and microscopic effects) and at large values (finite-size effects), as discussed in the Methods section, so the regression range must be selected with care.
-
-To determine a suitable fitting window in a reproducible way, a rolling-window procedure is employed. A linear regression is performed on each window, and for the $i$-th window the slope $m_i$, its standard error $\delta m_i$, and the coefficient of determination $r_i^2$ are recorded. Adjacent windows are then compared by forming the slope difference $d_i$ and its propagated uncertainty $\delta d_i$,
-\begin{equation}
-    d_i = \abs{m_i-m_{i+1}}, \qquad
-    \delta d_i = \sqrt{(\delta m_i)^2+(\delta m_{i+1})^2}.
-\end{equation}
-A window pair is classified as stable if the slope variation is statistically compatible with zero, $d_i < k\,\delta d_i$, and if both fits satisfy $r_i^2 \ge r_{\mathrm{thresh}}$ and $r_{i+1}^2 \ge r_{\mathrm{thresh}}$, where $k$ is a chosen deviation factor and $r_{\mathrm{thresh}}$ is a minimum fit-quality threshold. The final fitting interval is obtained by selecting the longest contiguous stable region and using its corresponding lower and upper boundaries for the exponent regression. At this point it is important to note that the procedure described above is heuristic and does not yield an exact or unique scaling window. The parameters $k$ and $r_{\mathrm{thresh}}$, as well as the window size, are tuned manually and can vary between model configurations.
-
-
-
-
-
-
-
-
+=======
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Measurement of scaling exponents}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+>>>>>>> main
