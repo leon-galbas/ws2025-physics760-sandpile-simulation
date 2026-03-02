@@ -1,6 +1,21 @@
-Complex systems have many interacting parts. Because of this, their large-scale behavior can be hard to predict from the rules at the smallest scale. If such a system is driven slowly and loses energy, it often relaxes in sudden bursts. These bursts can be small or very large. The sandpile model used here is a simple, fully discrete way to study this behavior. Energy is added at one site by an external drive. The system then redistributes energy using fixed, deterministic rules, while energy can leave through the boundaries. Repeating this drive–relaxation cycle can bring the system to a steady statistical state, where relaxation happens through avalanches.
+The idea of self-organized criticality (SOC) was introduced to explain why
+scale-free fluctuations and burst-like dynamics appear in many driven systems
+without fine tuning of parameters \cite{bak1987self}. A standard example is the
+Bak--Tang--Wiesenfeld (BTW) sandpile, where slow driving and local relaxation lead
+to avalanches with a broad range of sizes \cite{Dhar1990}. Because the rules are
+simple but the collective behavior is nontrivial, the sandpile has become a
+common test case for methods that measure scaling laws and critical exponents.
 
-In this project, we simulate the driven sandpile as a cellular automaton on finite hypercubic lattices. We then study the avalanche statistics in the steady state. We test different boundary conditions and driving methods. We also set practical rules for deciding when the initial transient (burn-in) period has ended. Finally, we look for scaling behavior using measured distributions and conditional averages of avalanche quantities.
+Many exponent values and scaling relations for sandpile models are known from the
+literature, for example the study of dynamical and spatial exponents by
+Christensen, Fogedby, and Jensen \cite{christensen1991dynamical}. Still, in
+practice the numerical estimation of these exponents depends on how the system is
+prepared (burn-in), on finite-size effects, and on how the scaling window is
+chosen for the fits. In this work, we simulate several sandpile variants on
+finite lattices and use them to compare different driving and boundary
+choices and apply a clear and reproducible data analysis procedure for the
+exponent fits, including simple checks for reaching the stationary state.
+
 
 \subsection{Cellular Automata}
 
