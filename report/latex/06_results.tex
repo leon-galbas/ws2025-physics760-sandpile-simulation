@@ -88,50 +88,12 @@ Especially for subsequent measurements in higher dimensions, it is crucial to tr
 
 Burn-in times for configurations A to F are measured for all three initialization schemes. The corresponding values are reported in Table \ref{tab:burn_in_times}. For most configurations, the shortest burn-in time is obtained with the maximal initialization. All subsequent simulations and measurements therefore use this initialization scheme.
 
-\begin{table*}[!ht]
-  \centering
-  \input{../../figures/tables/scaling_exp_closed_nonconservative.tex}
-  \caption{...}
-  \label{tab:scaling_exp_closed_nonconservative}
-\end{table*}
-\begin{table*}[!ht]
-  \centering
-  \input{../../figures/tables/scaling_exp_closed_nonconservative_gamma.tex}
-  \caption{...}
-  \label{tab:scaling_exp_closed_nonconservative_gamma}
-\end{table*}
-\begin{table*}[!ht]
-  \centering
-  \input{../../figures/tables/scaling_exp_open_conservative.tex}
-  \caption{...}
-  \label{tab:scaling_exp_open_conservative}
-\end{table*}
-\begin{table*}[!ht]
-  \centering
-  \input{../../figures/tables/scaling_exp_open_conservative_gamma.tex}
-  \caption{...}
-  \label{tab:scaling_exp_open_conservative_gamma}
-\end{table*}
-\begin{table*}[!ht]
-  \centering
-  \input{../../figures/tables/scaling_exp_open_nonconservative.tex}
-  \caption{...}
-  \label{tab:scaling_exp_open_nonconservative}
-\end{table*}
-\begin{table*}[!ht]
-  \centering
-  \input{../../figures/tables/scaling_exp_open_nonconservative_gamma.tex}
-  \caption{...}
-  \label{tab:scaling_exp_open_nonconservative_gamma}
-\end{table*}
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Measurement of scaling exponents}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 After preparing every sandpile setup in Table \ref{tab:model_configurations} into its critical state, we take the specified number $N_{\text{measure}}$ measurements of $t$, $s$ and $l$. From this raw data, the PDFs $P(T=t)$, $P(S=s)$ and $P(L=l)$ with respective errors are computed via Equations (\ref{eqn:pdf_est}) and (\ref{eqn:pdf_err_est}).
 
-% TODO: include plots of P(s), P(t), P(l) for some model, exemplary. NAME: {fig:pdf-plot-example}
 \begin{figure}[!ht]
   \centering
 
@@ -162,7 +124,6 @@ After preparing every sandpile setup in Table \ref{tab:model_configurations} int
 
 To obtain the respective scaling exponents $\alpha$, $\tau$, $\lambda$ as defined in Equation (\ref{eqn:pdfs}), the probability distributions are plotted on a double logarithmic scale. After slicing the fitting window to the linear scaling region by applying the heuristic described in Section \ref{sec:calc-scaling-exponents}, a weighted linear least squares fit is applied. Figure \ref{fig:pdf-plot-example} shows exemplary plots for all three variables.
 
-% TODO: include plots of conditional exp vals some model, exemplary.  NAME: {fig:cond-plot-example}
 \begin{figure}[!ht]
   \centering
 
@@ -206,7 +167,7 @@ To obtain the respective scaling exponents $\alpha$, $\tau$, $\lambda$ as define
   \end{subfigure}
 
   \caption{Double logarithmic plots of the measured conditional exponents for sandpile A. The fitting window for the weighted linear least squares fit and the fitted line are shown. The slope and error of the line fit are given in the legend.}
-  \label{fig:pdf-plot-example}
+  \label{fig:cond-plot-example}
 \end{figure}
 
 Additionally, we calculate the conditional expectation values from the raw data through Equations (\ref{eqn:condexp_est}) and (\ref{eqn:condexp_err_est}). These expectation values are also plotted against their respective avalanche variables and fitted via the same approach as above. Figure \ref{fig:cond-plot-example} shows exemplary plots for all expectation values.
@@ -218,3 +179,40 @@ The scaling exponents $a$ for the PDFs are obtained from the slope $m\pm\Delta m
   a = 1-m, \qquad \delta a = \delta m.
 \end{equation}
 The scaling exponents for the conditional expectation values are directly obtained from $m$ and $\Delta m$. Table \ref{tab:scaling-exponents} gives an overview over all computed scaling exponents for all sandpile configurations. Additional plots for individual fits can be found in the appendix.
+
+\begin{table*}[!ht]
+  \centering
+  \input{../../figures/tables/scaling_exp_closed_nonconservative.tex}
+  \caption{...}
+  \label{tab:scaling_exp_closed_nonconservative}
+\end{table*}
+\begin{table*}[!ht]
+  \centering
+  \input{../../figures/tables/scaling_exp_closed_nonconservative_gamma.tex}
+  \caption{...}
+  \label{tab:scaling_exp_closed_nonconservative_gamma}
+\end{table*}
+\begin{table*}[!ht]
+  \centering
+  \input{../../figures/tables/scaling_exp_open_conservative.tex}
+  \caption{...}
+  \label{tab:scaling_exp_open_conservative}
+\end{table*}
+\begin{table*}[!ht]
+  \centering
+  \input{../../figures/tables/scaling_exp_open_conservative_gamma.tex}
+  \caption{...}
+  \label{tab:scaling_exp_open_conservative_gamma}
+\end{table*}
+\begin{table*}[!ht]
+  \centering
+  \input{../../figures/tables/scaling_exp_open_nonconservative.tex}
+  \caption{...}
+  \label{tab:scaling_exp_open_nonconservative}
+\end{table*}
+\begin{table*}[!ht]
+  \centering
+  \input{../../figures/tables/scaling_exp_open_nonconservative_gamma.tex}
+  \caption{...}
+  \label{tab:scaling_exp_open_nonconservative_gamma}
+\end{table*}
