@@ -12,9 +12,9 @@ We simulate and analyze the sandpile model for a range of parameter choices and 
     D & 3 & 20 & open   & nonconservative & $10^7$ \\
     E & 3 & 20 & open   & conservative    & $10^7$ \\
     F & 3 & 20 & closed & nonconservative & $10^7$ \\
-    G & 4 & 20 & open   & nonconservative & $10^7$ \\
-    H & 4 & 20 & open   & conservative    & $10^7$ \\
-    I & 4 & 20 & closed & nonconservative & $10^7$ \\
+    G & 4 & 20 & open   & nonconservative & $10^6$ \\
+    H & 4 & 20 & open   & conservative    & $10^6$ \\
+    I & 4 & 20 & closed & nonconservative & $10^6$ \\
     \hline
   \end{tabular}
   \caption{Simulated model configurations and measurement counts used in this work.}
@@ -55,11 +55,11 @@ Figure \ref{fig:burn-in-comparison-zero} shows $\langle z\rangle(\tau)$ for conf
   \begin{tabular}{l|cccccc}
     init/system & A & B & C & D & E & F \\
     \hline
-    zero   & 50001 & 174000 & 52000 & 74000 & 449000 & 73000 \\
-    max    & 50000 & 50000  & 50000 & 53000 & 93000  & 53000 \\
-    random & 50000 & 76000  & 50000 & 54000 & 88000  & 53000 \\
+    zero   & 50 & 174 & 520 & 74 & 449 & 73 \\
+    max    & 50 & 50  & 50 & 53 & 93  & 53 \\
+    random & 50 & 76  & 50 & 54 & 88  & 53 \\
   \end{tabular}
-  \caption{Measured burn-in times (in driving steps) for configurations A--F under three different initialization schemes: all sites set to zero (zero), all sites set to the threshold height $z_c$ (max), and random initialization with $z \sim U(0,z_c)$ (random).}
+  \caption{Measured burn-in times (in 1000 driving steps) for configurations A--F under three different initialization schemes: all sites set to zero (zero), all sites set to the threshold height $z_c$ (max), and random initialization with $z \sim U(0,z_c)$ (random).}
   \label{tab:burn_in_times}
 \end{table}
 

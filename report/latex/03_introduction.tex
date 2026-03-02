@@ -1,3 +1,7 @@
+Complex systems have many interacting parts. Because of this, their large-scale behavior can be hard to predict from the rules at the smallest scale. If such a system is driven slowly and loses energy, it often relaxes in sudden bursts. These bursts can be small or very large. The sandpile model used here is a simple, fully discrete way to study this behavior. Energy is added at one site by an external drive. The system then redistributes energy using fixed, deterministic rules, while energy can leave through the boundaries. Repeating this drive–relaxation cycle can bring the system to a steady statistical state, where relaxation happens through avalanches.
+
+In this project, we simulate the driven sandpile as a cellular automaton on finite hypercubic lattices. We then study the avalanche statistics in the steady state. We test different boundary conditions and driving methods. We also set practical rules for deciding when the initial transient (burn-in) period has ended. Finally, we look for scaling behavior using measured distributions and conditional averages of avalanche quantities.
+
 \subsection{Cellular Automata}
 
 Cellular automata (CA), first introduced by John von Neumann~\cite{vonNeumann1966SelfReproducing}, provide a discrete-time framework for modeling the evolution of spatially extended systems with local interactions. In the recent literature, e.g.\ \cite{PerezDelgadoCheung2007}, CA are often specified as a 4-tuple $(R,M,Q,\delta)$ consisting of

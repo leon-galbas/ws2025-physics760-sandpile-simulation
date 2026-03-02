@@ -1,0 +1,14 @@
+In this chapter, we discuss what we observe once the simulations are running in practice, and what the measurements tell us. We first focus on the burn-in phase, since it sets the point from which our data can be treated as stationary. We then turn to the scaling exponents extracted from avalanche statistics and comment on how robust they are across models and system sizes. Finally, we summarise the main trends in the results and highlight the most likely sources of systematic error.
+\subsection{Burn-in dynamics and monitoring}
+
+To measure avalanche statistics, we first need the system to settle into a steady state. The early part of the run is the burn-in phase. In this phase, average quantities still change with time. We monitor this by tracking the mean energy (mean slope) $\langle z\rangle(\tau)$ and waiting until it stops showing a clear trend.
+
+Models A and B behave differently because they introduce energy differently. Model A uses nonconservative driving, so it increases the total energy directly and the system reaches the stationary energy density relatively quickly. Model B uses a conservative perturbation. In the bulk it keeps the total energy roughly constant and mainly redistributes what is already there. Starting from an empty lattice, this makes model B take much longer to build up to the stationary level than model A.
+
+A reasonable explanation is that, with our boundary conditions, conservative perturbations only create a net energy increase through boundary effects. The conservative update subtracts energy from shifted neighbour sites. At the boundaries some of these sites are clamped (especially at the lower boundary), so this subtraction can be partly blocked. This means the perturbation can effectively add energy only when it interacts with the edges, while perturbations in the bulk are close to energy-neutral. If most of the net input comes from the edges, then the build-up from $z_0=0$ is naturally slower and more sensitive to how the boundaries are implemented.
+
+\subsection{Reducing burn-in by changing the initial condition}
+
+The long burn-in in model B is mainly due to how slowly the system fills up when starting from $z_0=0$. A direct way to shorten it is to start closer to the stationary energy density. This motivates the alternative initial conditions: random initialization $z_0\sim U(0,z_c)$ and maximally stable initialization $z_0=z_c$. Both preload the lattice with energy, so fewer driving steps are needed before $\langle z\rangle(\tau)$ stops drifting.
+
+These initial conditions also reduce the time spent in a clearly nonstationary regime, where avalanches are not representative of the steady state. The benefit is largest for conservative driving, where the fill-up stage is slowest. For cases that equilibrate quickly, the burn-in time still cannot drop below the built-in minimum $T_{\min}$ set by the stationarity check procedure.
