@@ -25,7 +25,7 @@ for all $r\in R_u(\tau)$. The time evolution step of an unstable sandpile is als
 
 Inside the lattice, relaxation events preserve the total energy $\sum_{r\in r}z(r)$ of the system, as can be seen from Equation \ref{eqn:relaxation}. Only at the lattice boundaries, where $r_i=1$ or $r_i=N$ for some $1\leq i\leq N$, can the energy be dissipated.
 
-% TODO explain boundary conditions
+% TODO: explain boundary conditions
 TODO: BOUNDARY CONDITIONS
 
 Hence, after a certain amount of relaxation steps, we reach a stable state. A consecutive number of $t$ relaxations which brings an unstable sandpile to a stable state is called an \emph{avalanche} of lifetime $t$.
@@ -59,6 +59,8 @@ fluctuates around a temporal mean value
     \overline{\expval{z}} = \lim_{T'\to\infty}\frac{1}{T'-T}\int_{T}^{T'}\expval{z}(\tau)\dd{\tau}.
 \end{equation}
 This means that in this state, the energy introduced to the sandpile by each perturbation averages out with the energy lost through avalanches by dissipation at the boundaries over time. Once a sandpile has reached a critical state, it remains in this state \cite{gros2015cellular}. Hence the term Self-Organized Criticality \cite{Dhar1990}.
+
+% NOTE: Vllt bis hier in den Theorieteil
 
 While Christensen et al. initialize all sandpiles with $z_0=0$ everywhere and run Algorithm \ref{alg:step} until $\expval{z}(\tau)$ becomes stationary, we introduce two additional burn in strategies, in an effort to reduce the burn-in time $T$ and converge to the stationary state more quickly:
 \begin{itemize}
@@ -97,19 +99,38 @@ When the system is in a critical state, we expect the behavior of avalanche char
 \end{align}
 where $\alpha,\tau,\lambda$ are scaling parameters to be determined. Note that the parameter $\tau$ here is different from the timestep $\tau$ used before. Additionally, we also expect the conditional expectation values of the avalanche parameters with respect to each other to obey power laws
 \begin{align}
-    E[S \mid T=t] &\propto t^{\gamma_1}, \nonumber \\
-    E[T \mid S=s] &\propto t^{1/\gamma_1}, \nonumber \\
-    E[S \mid L=l] &\propto t^{\gamma_2}, \nonumber \\
-    E[L \mid S=s] &\propto t^{1/\gamma_2}, \\
-    E[T \mid L=l] &\propto t^{\gamma_3}, \nonumber \\
-    E[L \mid T=t] &\propto t^{1/\gamma_3}. \nonumber
+    \bE[S \mid T=t] &\propto t^{\gamma_1}, \nonumber \\
+    \bE[T \mid S=s] &\propto t^{1/\gamma_1}, \nonumber \\
+    \bE[S \mid L=l] &\propto t^{\gamma_2}, \nonumber \\
+    \bE[L \mid S=s] &\propto t^{1/\gamma_2}, \\
+    \bE[T \mid L=l] &\propto t^{\gamma_3}, \nonumber \\
+    \bE[L \mid T=t] &\propto t^{1/\gamma_3}. \nonumber
 \end{align}
 
 In order to measure these scaling parameters for a sandpile, we bring the sandpile into a critical state through a burn-in phase. Then, we continually relax and perturb the system according to Algorithm \ref{alg:step}. Every time an avalanche occurs, we track its characteristics $t$, $s$ and $l$, until we have obtained $N_{\text{measure}}$ samples. We estimate the probability distribution of the random variable $X$ via the relative frequency
 \begin{equation}
-    P(X=x) \approx
+    P(X=x) = \frac{N_x}{N_{\text{measure}}}
 \end{equation}
-
+where $N_x$ is the number of samples for which $X=x$. The standard deviation of this estimator is
+\begin{equation}
+    \sigma_P = \sqrt{\frac{P(x)(1-P(x))}{N}}.
+\end{equation}
+The conditional expectation values are measured via
+\begin{align}
+    \bE [X\mid Y=y] &= \sum_x xP(X=x\mid Y=y) \nonumber \\
+    &\approx \frac{\sum_{i=1}^N X_i\one_{\{Y_i=y\}}}{N_y},
+\end{align}
+where $\one$ is the indicator function. Their standard deviation can be estimated as
+\begin{equation}
+    \sqrt{\frac{\f{Var}(X\mid Y=y)}{N_y}}
+\end{equation}
+with
+\begin{equation}
+    \f{Var}(X\mid Y=y) = \frac{1}{N_y-1}\sum_{i=1}^N (X_i-\bar{X}_y)^2\one_{\{Y_i=y\}}.
+\end{equation}
+To justify this measurement approach, we need to assume avalanche variables $X_i$ to be identically and independently distributed \cite{pruessner2012numerical}.
+% TODO: Elaborate
+%The former is the case in the critical state.
 
 The algorithms described above were implemented in Python. For efficient handling of multi-dimensional data we used the PyTorch \cite{paszke2019pytorch} library. All further data analysis was performed using NumPy \cite{harris2020array} for data manipulation and Matplotlib \cite{hunter2007matplotlib} for visualization. The source code used to generate all numerical results presented in the following sections is publicly available on GitHub at
 % TODO: Insert github link

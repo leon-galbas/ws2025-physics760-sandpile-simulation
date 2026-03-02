@@ -24,6 +24,7 @@ def run_simulation(
         if n > 0:
             logging.info(f"Performing missing {n=} measurements.")
             model.measure(num_measurements=n)
+            model.save(model_name)
     else:
         model = SandpileModel(
             N,
