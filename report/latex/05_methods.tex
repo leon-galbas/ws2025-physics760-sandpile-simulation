@@ -38,7 +38,11 @@ The standard deviation for a linear least squares fit of $W$ values with error f
 \begin{equation}
     \sigma_m = \Delta\expval{z}\sqrt{\frac{12}{W(W^2-1)}} = \sqrt{\frac{12}{N^dW(W^2-1)}}.
 \end{equation}
-It is thus sensible to choose $\epsilon > 5\sigma_m$. This way, a system is assumed to be unstationary if its fluctuations of $\expval{z}(\tau)$ lie outside the $5\sigma$-interval of the natural fluctuations int $\expval{z}$. The chosen parameters for the check interval and window size are $\Delta\tau_c=1000$ and $W=50$.
+It is thus sensible to choose $\epsilon > 5\sigma_m$. This way, a system is assumed to be unstationary if its fluctuations of $\expval{z}(\tau)$ lie outside the $5\sigma$-interval of the natural fluctuations int $\expval{z}$. The chosen parameters for the check interval and window size are $\Delta\tau_c=1000$ and $W=50$. Note that this results in a minimal burn-in time of
+\begin{equation}
+    T_\f{min} = \Delta\tau_c\cdot W = \num{50000} \label{eqn:minimal-burnin}
+\end{equation}
+steps.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{The measurement phase}

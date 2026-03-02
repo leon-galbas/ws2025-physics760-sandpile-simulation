@@ -84,9 +84,9 @@ Figure \ref{fig:burn-in-comparison-zero} shows $\langle z\rangle(\tau)$ for conf
   \label{fig:burn-in-comparison-init}
 \end{figure}
 
-Especially for subsequent measurements in higher dimensions, it is crucial to try to reduce the burn-in time and traverse towards the stationary state in as few steps as possible. To do this, two alternative initialization schemes are tested, as described in Section \ref{sec:burn-in}. The resulting burn-in curves for configuration B are shown in Figure \ref{fig:burn-in-comparison-init}. Compared to the zero initialization, both schemes reach the stationary regime significantly faster. For configuration A, the burn-in time does not change appreciably, as it is already close to smallest possible burn-in time resulting from the algorithm introduced in the methods section.
+Especially for subsequent measurements in higher dimensions, it is crucial to try to reduce the burn-in time and traverse towards the stationary state in as few steps as possible. To do this, two alternative initialization schemes are tested, as described in Section \ref{sec:burn-in}. The resulting burn-in curves for configuration B are shown in Figure \ref{fig:burn-in-comparison-init}. Compared to the zero initialization, both schemes reach the stationary regime significantly faster. For configurations A and C, the burn-in time does not see an appreciable improvement, as \num{50000} steps is already the minimum number of burn in steps required due to Equation (\ref{eqn:minimal-burnin}).
 
-Burn-in times for configurations A--F are measured for all three initialization schemes. The corresponding values are reported in Table \ref{tab:burn_in_times}. For most configurations, the shortest burn-in time is obtained with the maximal initialization. All subsequent simulations and measurements therefore use this initialization scheme.
+Burn-in times for configurations A to F are measured for all three initialization schemes. The corresponding values are reported in Table \ref{tab:burn_in_times}. For most configurations, the shortest burn-in time is obtained with the maximal initialization. All subsequent simulations and measurements therefore use this initialization scheme.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Measurement of scaling exponents}
