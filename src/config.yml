@@ -1,4 +1,61 @@
+# directory setup
 model_dir: "models"
 data_dir: "data"
 figure_dir: "figures"
 log_dir: "logs"
+# model configurations
+model_configurations:
+  A:
+    N: 40
+    d: 2
+    boundary_condition: open
+    perturbation: nonconservative
+    num_measurements: 1e7
+  B:
+    N: 40
+    d: 2
+    boundary_condition: open
+    perturbation: conservative
+    num_measurements: 1e7
+  C:
+    N: 40
+    d: 2
+    boundary_condition: closed
+    perturbation: nonconservative
+    num_measurements: 1e7
+  D:
+    N: 20
+    d: 3
+    boundary_condition: open
+    perturbation: nonconservative
+    num_measurements: 1e7
+  E:
+    N: 20
+    d: 3
+    boundary_condition: open
+    perturbation: conservative
+    num_measurements: 1e7
+  F:
+    N: 20
+    d: 3
+    boundary_condition: closed
+    perturbation: nonconservative
+    num_measurements: 1e7
+  G:
+    N: 20
+    d: 4
+    boundary_condition: open
+    perturbation: nonconservative
+    num_measurements: 1e6
+  H:
+    N: 20
+    d: 4
+    boundary_condition: open
+    perturbation: conservative
+    num_measurements: 1e6
+  I:
+    N: 20
+    d: 4
+    boundary_condition: closed
+    perturbation: nonconservative
+    num_measurements: 1e6

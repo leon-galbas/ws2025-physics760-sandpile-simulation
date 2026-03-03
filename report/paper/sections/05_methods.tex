@@ -70,8 +70,6 @@ with
     \f{Var}(X\mid Y=y) = \frac{1}{N_y-1}\sum_{i=1}^N (X_i-\bar{X}_y)^2\one_{\{Y_i=y\}}.
 \end{equation}
 To justify this measurement approach, we need to assume avalanche variables $X_i$ to be identically and independently distributed \cite{pruessner2012numerical}.
-% TODO: Elaborate
-%The former is the case in the critical state.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Calculating scaling exponents} \label{sec:calc-scaling-exponents}
@@ -104,5 +102,4 @@ Because our sample size is very large ($N_\mathrm{measure}=10^{7}$), the statist
 The errors printed in the next section are always the total errors.
 
 \subsection*{Implementation}
-The algorithms described above were implemented in Python. For efficient handling of multi-dimensional data we used the PyTorch \cite{paszke2019pytorch} library. All further data analysis was performed using NumPy \cite{harris2020array} for data manipulation and Matplotlib \cite{hunter2007matplotlib} for visualization. The source code used to generate all numerical results presented in the following sections is publicly available on GitHub at \url{https://github.com/lebega/physics760-computational-physics}. 
-% TODO: Insert github link
+The algorithms described above were implemented in Python. For efficient handling of multi-dimensional data we used the PyTorch \cite{paszke2019pytorch} library. All further data analysis was performed using NumPy \cite{harris2020array} for data manipulation and Matplotlib \cite{hunter2007matplotlib} for visualization. The source code used to generate all numerical results presented in the following sections is publicly available on GitHub at \href{https://github.com/leon-galbas/ws2025-physics760-sandpile-simulation}{https://github.com/leon-galbas/ws2025-physics760-sandpile-simulation}.

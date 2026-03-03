@@ -1,23 +1,10 @@
-The idea of self-organized criticality (SOC) was introduced to explain why
-scale-free fluctuations and burst-like dynamics appear in many driven systems
-without fine tuning of parameters \cite{bak1987self}. A standard example is the
-Bak--Tang--Wiesenfeld (BTW) sandpile, where slow driving and local relaxation lead
-to avalanches with a broad range of sizes \cite{Dhar1990}. Because the rules are
-simple but the collective behavior is nontrivial, the sandpile has become a
-common test case for methods that measure scaling laws and critical exponents.
+The idea of self-organized criticality (SOC) was introduced to explain why scale-free fluctuations and burst-like dynamics appear in many driven systems without fine tuning of parameters \cite{bak1987self}. A standard example is the Bak-Tang-Wiesenfeld (BTW) sandpile, where slow driving and local relaxation lead to avalanches with a broad range of sizes \cite{Dhar1990}. Because the rules are simple but the collective behavior is nontrivial, the sandpile has become a common test case for methods that measure scaling laws and critical exponents.
 
-Many exponent values and scaling relations for sandpile models are known from the
-literature, for example the study of dynamical and spatial exponents by
-Christensen, Fogedby, and Jensen \cite{christensen1991dynamical}. Still, in
-practice the numerical estimation of these exponents depends on how the system is
-prepared (burn-in), on finite-size effects, and on how the scaling window is
-chosen for the fits. In this work, we simulate several sandpile variants on
-finite lattices and use them to compare different driving and boundary
-choices and apply a clear and reproducible data analysis procedure for the
-exponent fits, including simple checks for reaching the stationary state.
+Many exponent values and scaling relations for sandpile models are known from the literature, for example the study of dynamical and spatial exponents by Christensen, Fogedby, and Jensen \cite{christensen1991dynamical}. Still, in practice the numerical estimation of these exponents depends on how the system is prepared (burn-in), on finite-size effects, and on how the scaling window is chosen for the fits. In this work, we simulate several sandpile variants on finite lattices and use them to compare different driving and boundary choices and apply a clear and reproducible data analysis procedure for the exponent fits, including simple checks for reaching the stationary state.
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Cellular Automata}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Cellular automata (CA), first introduced by John von Neumann~\cite{vonNeumann1966SelfReproducing}, provide a discrete-time framework for modeling the evolution of spatially extended systems with local interactions. In the recent literature, e.g.\ \cite{PerezDelgadoCheung2007}, CA are often specified as a 4-tuple $(R,M,Q,\delta)$ consisting of
 \begin{itemize}
@@ -35,7 +22,9 @@ where $q_t|_{M_r}$ denotes the restriction of the configuration to the neighborh
 
 In this work the lattice $R$ is a $d$-dimensional hypercubic grid of linear size $N$, i.e.\ $\abs{R}=N^d$, together with boundary conditions specified later. Starting from an initial configuration $q_0$, the rule $\delta$ determines the complete time evolution $\{q_t\}_{t\ge 0}$. Many physically motivated CA are additionally driven or perturbed by an external mechanism that modifies the configuration according to a separate prescription (for example, adding or subtracting values $q_t(r)\to q_t(r)\pm c$ at selected sites), after which the local update rule is applied again.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Self-Organized Criticality}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Many systems in statistical physics exhibit critical behavior only when an external control parameter is tuned to a specific value. A paradigmatic example is the Ising model, which becomes critical at a particular temperature $T=T_c$ \cite{stanley1971introduction}.
 At such a critical point the system becomes scale invariant meaning that correlations extend over all length scales and macroscopic observables show nontrivial scaling laws.
@@ -44,7 +33,9 @@ The system studied in this work behaves very differently. It approaches a critic
 
 In the SOC state, relaxation occurs through intermittent avalanches triggered by the drive. A defining feature is the absence of a characteristic avalanche scale, meaning events of many different sizes occur, from small local rearrangements up to system-spanning avalanches \cite{Dhar1990}.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Power Laws and Scaling} \label{sec:power-laws}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 A power law is a functional relationship in which one quantity changes proportionally to a fixed power of another. For two positive quantities $A$ and $B$, this is written as
 \begin{equation}

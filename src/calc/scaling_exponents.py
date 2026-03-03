@@ -10,117 +10,99 @@ def linear_func(x, m, b):
     return m * x + b
 
 
-def estimate_systematic_window_error(x, y, sigma, lower, upper, max_variation=3):
-    """
-    Estimates systematic error by perturbing the heuristic window boundaries
-    and computing the standard deviation of the resulting fit slopes.
-    """
-    slopes = []
-
-    # Constrain variations to array boundaries
-    l_min = max(0, lower - max_variation)
-    l_max = min(len(x) - 3, lower + max_variation)
-    u_min = max(3, upper - max_variation)
-    u_max = min(len(x), upper + max_variation)
-
-    for l in range(l_min, l_max + 1):
-        for u in range(u_min, u_max + 1):
-            # Ensure sufficient points for a meaningful fit
-            if u - l >= 3:
-                try:
-                    popt, _ = curve_fit(
-                        linear_func,
-                        x[l:u],
-                        y[l:u],
-                        sigma=sigma[l:u],
-                        absolute_sigma=True,
-                    )
-                    slopes.append(popt[0])
-                except RuntimeError:
-                    continue
-
-    if len(slopes) > 1:
-        return np.std(slopes, ddof=1)
-    return 0.0
-
-
 def compute_scaling_exponents(
-    data: pd.DataFrame, window_size, window_step_size, r_thresh, k, manuel_bounds={}
-):
+    data: pd.DataFrame,
+    window_size: int,
+    window_step_size: int,
+    r_thresh: float,
+    deviation_factor: float,
+    manual_bounds: dict = {},
+) -> dict:
+    """Compute all relevant scaling exponents for a given sandpile model.
 
+    Computes the scaling exponents alpha, tau, lambda as well as the exponents
+    gamma_1, gamma_2, gamma_3 and their inverse, obtained from linear log-log fits
+    of PDFs or conditional expectation values.
+
+    The additional arguments specify the heuristic used to calculate the scaling window.
+
+    The data is returned as a dictionary were each key is an exponent and the
+    coresponding value is a dictionary of fit parameters.
+
+    Args:
+        data (pd.DataFrame): Dataframe containing the measured avalanche
+            variables t, s, l of a sandpile.
+        window_size (int): Number of points per sliding regression window.
+        window_step_size (int): Step size (in points) between consecutive windows.
+        r_thresh (float): Minimum R^2 required for a window to be considered a good
+            linear fit.
+        deviation_factor (float):  Multiplier controlling how strict the slope-stability condition is.
+        manual_bounds (dict, optional): Allows to set manual boundaries for the scaling
+            windows. Defaults to {}.
+
+    Returns:
+        dict: Calculated scaling exponents.
+    """
     s = np.asarray(data["s"], dtype=np.int64)
     t = np.asarray(data["t"], dtype=np.int64)
     l = np.asarray(data["l"], dtype=np.int64)  # noqa: E741
+    args_scaling_window = (window_size, window_step_size, r_thresh, deviation_factor)
     exponents = {}
     logging.info("Calculating scaling exponents.")
 
     # Calculate exponents from probability densities
 
-    man_key = list(manuel_bounds.keys())
+    man_key = list(manual_bounds.keys())
 
     def _bounds_for(name: str):
-        return manuel_bounds.get(name) if name in man_key else None
+        return manual_bounds.get(name) if name in man_key else None
 
     exponents["tau"] = get_prob_exponent(
-        s, window_size, window_step_size, r_thresh, k, bounds=_bounds_for("tau")
+        s, args_scaling_window, bounds=_bounds_for("tau")
     )
-
     exponents["alpha"] = get_prob_exponent(
-        t, window_size, window_step_size, r_thresh, k, bounds=_bounds_for("alpha")
+        t, args_scaling_window, bounds=_bounds_for("alpha")
     )
-
     exponents["lambda"] = get_prob_exponent(
-        l, window_size, window_step_size, r_thresh, k, bounds=_bounds_for("lambda")
+        l, args_scaling_window, bounds=_bounds_for("lambda")
     )
 
     logging.info("Calculating conditional scaling exponents.")
     # Calculate exponents from conditional expectation values
     exponents["gamma_1"] = get_cond_exponent(
-        t, s, window_size, window_step_size, r_thresh, k, bounds=_bounds_for("gamma_1")
+        t, s, args_scaling_window, bounds=_bounds_for("gamma_1")
     )
     exponents["inv_gamma_1"] = get_cond_exponent(
         s,
         t,
-        window_size,
-        window_step_size,
-        r_thresh,
-        k,
+        args_scaling_window,
         bounds=_bounds_for("inv_gamma_1"),
     )
-
     exponents["gamma_2"] = get_cond_exponent(
-        l, s, window_size, window_step_size, r_thresh, k, bounds=_bounds_for("gamma_2")
+        l, s, args_scaling_window, bounds=_bounds_for("gamma_2")
     )
     exponents["inv_gamma_2"] = get_cond_exponent(
         s,
         l,
-        window_size,
-        window_step_size,
-        r_thresh,
-        k,
+        args_scaling_window,
         bounds=_bounds_for("inv_gamma_2"),
     )
-
     exponents["gamma_3"] = get_cond_exponent(
-        l, t, window_size, window_step_size, r_thresh, k, bounds=_bounds_for("gamma_3")
+        l, t, args_scaling_window, bounds=_bounds_for("gamma_3")
     )
     exponents["inv_gamma_3"] = get_cond_exponent(
         t,
         l,
-        window_size,
-        window_step_size,
-        r_thresh,
-        k,
+        args_scaling_window,
         bounds=_bounds_for("inv_gamma_3"),
     )
 
-    # logging.info(f"Calculated exponents:\n{exponents}")
     return exponents
 
 
 def get_prob_exponent(
-    x: np.ndarray, window_size, window_step_size, r_thresh, k, bounds=None
-) -> tuple[float, float]:
+    x: np.ndarray, args_scaling_window: tuple[int, int, float, float], bounds=None
+) -> tuple[np.ndarray, dict]:
     """Calculate probability density scaling exponent.
 
     This assumes that P(X=x) ~ x^(1-a). To obtain a, the function fits log(P(X=x))
@@ -128,10 +110,12 @@ def get_prob_exponent(
 
     Args:
         x (np.ndarray): Array of x values.
+        args_scaling_window (tuple[int, int, float, float]): The parameters for
+            determining the scaling window
 
     Returns:
-        dict: paramters for plotting.
-        values np.array: log(x) and log(y) values for plotting
+        np.array: The values [log(x), log(y), Delta_log(y)] for plotting
+        dict: The fit parameters.
     """
     # Compute probabilities
     unique_x, counts = np.unique(x, return_counts=True)
@@ -144,17 +128,16 @@ def get_prob_exponent(
     N = len(P)
     P_err = np.sqrt(P * (1 - P) / N)
 
-    # Do a linear log-log-fit
+    # Prepare data for fitting
     log_x = np.log10(x)
     log_P = np.log10(P)
     log_P_err = P_err / (10 * P)
     if bounds == None:
-        lower, upper = get_scaling_window(
-            log_x, log_P, window_size, window_step_size, r_thresh, k
-        )
+        lower, upper = get_scaling_window(log_x, log_P, *args_scaling_window)
     else:
         lower, upper = bounds
 
+    # Do linear log-log fit
     popt, pcov = curve_fit(
         linear_func,
         log_x[lower:upper],
@@ -166,13 +149,15 @@ def get_prob_exponent(
     std_err_stat = np.sqrt(np.diag(pcov))[0]
     intercept_stderr = np.sqrt(np.diag(pcov))[1]
 
+    # Calculate systematic error and combined error
     std_err_sys = estimate_systematic_window_error(
         log_x, log_P, log_P_err, lower, upper
     )
-
     std_err = np.sqrt(std_err_stat**2 + std_err_sys**2)
 
-    parms = {
+    # Return values and parameters
+    values = np.array([log_x, log_P, log_P_err])
+    fit_params = {
         "exponent": 1 - exp,
         "std_err": std_err,
         "intercept": intercept,
@@ -180,20 +165,15 @@ def get_prob_exponent(
         "lower": lower,
         "upper": upper,
     }
-
-    values = np.array([log_x, log_P, log_P_err])
-    return values, parms
+    return values, fit_params
 
 
 def get_cond_exponent(
     x: np.ndarray,
     y: np.ndarray,
-    window_size,
-    window_step_size,
-    r_thresh,
-    k,
+    args_scaling_window: tuple[int, int, float, float],
     bounds=None,
-) -> tuple[float, float]:
+) -> tuple[np.ndarray, dict]:
     """Calculate conditional expectation value scaling exponents.
 
     This assumes that E[Y|X=x] ~ x^a. To obtain a, the function fits log(E[Y|X=x])
@@ -202,39 +182,29 @@ def get_cond_exponent(
     Args:
         x (np.ndarray): Array of x values.
         y (np.ndarray): Array of y values.
+        args_scaling_window (tuple[int, int, float, float]): The parameters for
+            determining the scaling window
 
     Returns:
-        dict: paramters for plotting.
-        values np.array: log(x) and log(y) values for plotting
+        np.array: The values [log(x), log(y), Delta_log(y)] for plotting
+        dict: The fit parameters.
     """
-    # Map any discrete y values to 0, 1, ..., K-1
+    # Prepare values for calculating E, Delta_E
     unique_y, y_idx = np.unique(y, return_inverse=True)
-
-    # N_y: count of elements for each unique y
     N_y = np.bincount(y_idx)
-
-    # Sum of X and X^2 conditioned on y
     sum_x = np.bincount(y_idx, weights=x)
     sum_x2 = np.bincount(y_idx, weights=x**2)
 
-    # Suppress divide-by-zero warnings for empty bins/N_y=1 during array operations
+    # Calculate conditional expectation values and their statistical stderr
     with np.errstate(divide="ignore", invalid="ignore"):
-        # Equation (24): Conditional expectation
         E = sum_x / N_y
-
-        # Equation (26) Expanded: Conditional sample variance (ddof=1)
-        # Using np.maximum to avoid small negative floats due to precision errors
         sum_sq_diff = np.maximum(sum_x2 - N_y * E**2, 0)
         var_cond = sum_sq_diff / (N_y - 1)
-
-        # Equation (25): Standard deviation of the estimator
         sigma_E = np.sqrt(var_cond / N_y)
-
-    # Handle mathematical undefined states directly
     E[N_y == 0] = np.nan
     sigma_E[N_y <= 1] = np.nan
 
-    # DO fit
+    # Filter valid values
     valid = (
         (unique_y > 0) & (E > 0) & np.isfinite(E) & (sigma_E > 0) & np.isfinite(sigma_E)
     )
@@ -242,19 +212,16 @@ def get_cond_exponent(
     E_val = E[valid]
     sigma_E_val = sigma_E[valid]
 
-    # 2. Transform to log-log space
+    # Prepare data for fitting
     log_y = np.log10(y_val)
     log_E = np.log10(E_val)
-
-    # 3. Propagate errors to logarithmic space
     sigma_log_E = sigma_E_val / (10 * E_val)
-
     if bounds == None:
-        lower, upper = get_scaling_window(
-            log_y, log_E, window_size, window_step_size, r_thresh, k
-        )
+        lower, upper = get_scaling_window(log_y, log_E, *args_scaling_window)
     else:
         lower, upper = bounds
+
+    # Do linear log-log fit
     popt, pcov = curve_fit(
         f=linear_func,
         xdata=log_y[lower:upper],
@@ -266,14 +233,15 @@ def get_cond_exponent(
     std_err_stat = np.sqrt(np.diag(pcov))[0]
     intercept_stderr = np.sqrt(np.diag(pcov))[1]
 
+    # Calculate systematic error and combined error
     std_err_sys = estimate_systematic_window_error(
         log_y, log_E, sigma_log_E, lower, upper
     )
-
     std_err = np.sqrt(std_err_stat**2 + std_err_sys**2)
 
-    # parameters relevant for plotting
-    parms = {
+    # Return values and parameters
+    values = np.array([log_y, log_E, sigma_log_E])
+    fit_params = {
         "exponent": exp,
         "std_err": std_err,
         "intercept": intercept,
@@ -281,33 +249,33 @@ def get_cond_exponent(
         "lower": lower,
         "upper": upper,
     }
-    # values for plotting
-    values = np.array([log_y, log_E, sigma_log_E])
-    return values, parms
+    return values, fit_params
 
 
-def get_scaling_window(x, y, window_size, window_step_size, r_thresh, deviation_factor):
-    """
-    Find a heuristic scaling window (in log-log space) using a sliding-window
+def get_scaling_window(
+    x: np.ndarray,
+    y: np.ndarray,
+    window_size: int,
+    window_step_size: int,
+    r_thresh: float,
+    deviation_factor: float,
+) -> tuple[int, int]:
+    """Find a heuristic scaling window in log-log space using a sliding-window
     regression and a slope-stability criterion.
 
-    Parameters
-    ----------
-    x, y : array
-    window_size : int
-        Number of points per sliding regression window.
-    window_step_size : int
-        Step size (in points) between consecutive windows.
-    r_thresh : float
-        Minimum R^2 required for a window to be considered a good linear fit.
-    deviation_factor : float
-        Multiplier controlling how strict the slope-stability condition is.
+    Args:
+        x (array-like): The x-values in log-log space.
+        y (array-like): The y-values in log-log space.
+        window_size (int): Number of points per sliding regression window.
+        window_step_size (int): Step size (in points) between consecutive windows.
+        r_thresh (float): Minimum R^2 required for a window to be considered a
+            good linear fit.
+        deviation_factor (float): Multiplier controlling how strict the
+            slope-stability condition is.
 
-    Returns
-    -------
-    lower, upper : int
-        Indices that mark the start and end of the longest linear region.
-
+    Returns:
+        tuple[int, int]: A tuple (lower, upper) representing the indices
+            marking the start and end of the longest linear region.
     """
     # initialize important arrays and variables
     n = len(x)
@@ -363,3 +331,56 @@ def get_scaling_window(x, y, window_size, window_step_size, r_thresh, deviation_
     # compute and return upper and lower
     upper = lower + best_len
     return lower, upper
+
+
+def estimate_systematic_window_error(
+    x: np.ndarray,
+    y: np.ndarray,
+    y_err: np.ndarray,
+    lower: int,
+    upper: int,
+    max_variation: int = 3,
+) -> float:
+    """Estimates systematic error by perturbing the heuristic scaling window boundaries
+    and computing the standard deviation of the resulting fit slopes.
+
+    Args:
+        x (np.ndarray): The x values.
+        y (np.ndarray): The y values.
+        y_err (np.ndarray): The y errors.
+        lower (int): Lower end of the scaling window.
+        upper (int): Upper end of the scaling window.
+        max_variation (int, optional): Perturbation of the window boundaries.
+            Defaults to 3.
+
+    Returns:
+        float: The systematic slope error of a linear fit of x against y.
+    """
+    slopes = []
+
+    # Constrain variations to array boundaries
+    l_min = max(0, lower - max_variation)
+    l_max = min(len(x) - 3, lower + max_variation)
+    u_min = max(3, upper - max_variation)
+    u_max = min(len(x), upper + max_variation)
+
+    for l in range(l_min, l_max + 1):
+        for u in range(u_min, u_max + 1):
+            # Ensure sufficient points for a meaningful fit
+            if u - l >= 3:
+                try:
+                    popt, _ = curve_fit(
+                        linear_func,
+                        x[l:u],
+                        y[l:u],
+                        sigma=y_err[l:u],
+                        absolute_sigma=True,
+                    )
+                    slopes.append(popt[0])
+                except RuntimeError:
+                    continue
+
+    if len(slopes) > 1:
+        return np.std(slopes, ddof=1)
+    else:
+        return 0.0
