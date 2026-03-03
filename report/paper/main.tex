@@ -1,4 +1,4 @@
-% ****** Start of file apssamp.tex ******
+% ****** Start of file main.tex ******
 %
 %   This file is part of the APS files in the REVTeX 4.2 distribution.
 %   Version 4.2a of REVTeX, December 2014
@@ -36,8 +36,8 @@ runinaddress,
 \begin{document}
 
 \preprint{APS/123-QED}
-\input{01_title}
-\input{02_abstract}
+\input{sections/01_title}
+\input{sections/02_abstract}
 \maketitle
 
 
@@ -45,29 +45,29 @@ runinaddress,
 %\tableofcontents
 
 \section{Introduction \label{sec:intro}}
-\input{03_introduction}
+\input{sections/03_introduction}
 
 \section{Theoretical Basis \label{sec:theory}}
-\input{04_theory}
+\input{sections/04_theory}
 
 \section{Methods \label{sec:methods}}
-\input{05_methods}
+\input{sections/05_methods}
 
 \section{Results \label{sec:results}}
-\input{06_results}
+\input{sections/06_results}
 
 \section{Discussion \label{sec:discussion}}
-\input{07_discussion}
+\input{sections/07_discussion}
 
 \section{Summary \label{sec:summary}}
-\input{08_summary}
+\input{sections/08_summary}
 
 
-\bibliography{apssamp}% Produces the bibliography via BibTeX.
+\bibliography{references}% Produces the bibliography via BibTeX.
 
 \section*{Appendix \label{sec:appendix}}
 \clearpage
-\input{09_appendinx}
+\input{sections/09_appendix}
 
 
 \end{document}
