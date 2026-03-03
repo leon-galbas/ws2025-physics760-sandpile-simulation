@@ -1,10 +1,14 @@
 # Physics 760: Sandpile Simulation (WS 2024/25)
 
+Authors: Konrad Beck and Leon Galbas (Universität Bonn)
+
 ## Overview
 
 This repository contains a numerical implementation of the Bak-Tang-Wiesenfeld
 (BTW) model, designed to simulate and analyze the dynamics of self-organized
-criticality (SOC) in sandpiles.
+criticality (SOC) in sandpiles. It was created as part of a project work for the
+Computational Physics lecture in the winter semester 2025/26 at the University
+of Bonn.
 
 ## Theoretical Foundation
 
@@ -68,7 +72,7 @@ uv run -m src.main
 The `-m` flag is important to execute the script as a module. Otherwise, imports
 within the repository will break.
 
-[!IMPORTANT] Note that the actual simulations with $10^6$ or even $10^7$
+IMPORTANT: Note that the actual simulations with $10^6$ or even $10^7$
 measurements take a very long time to execute. To decrease the number of
 measurements for testing purposes, one can do so by changing the respective
 values in `src/config.yml`.
