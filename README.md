@@ -10,7 +10,7 @@ criticality (SOC) in sandpiles. It was created as part of a project work for the
 Computational Physics lecture in the winter semester 2025/26 at the University
 of Bonn.
 
-## Theoretical Foundation
+### Theoretical Foundation
 
 The project primarily reproduces the work of **Christensen et al.** with a
 modern implementation of the sandpile using Python. The main references are:
@@ -24,6 +24,13 @@ modern implementation of the sandpile using Python. The main references are:
 
 For further details regarding this project, regard the
 [paper](./report/2026_SimulatingSandpiles_Beck-Galbas).
+
+### Implementation
+
+The actual implementation of the sandpile model, which is arguably the most 
+interesting part, can be found in `src/model/sandpile.py`. The rest of the 
+source code is mainly concerned with running experiments and creating plots
+and tables for the project report.
 
 ## Installation
 
@@ -53,7 +60,7 @@ For further details, refer to the package's
 
 After cloning the repository, navigate to the project root and initialize the
 environment to ensure all dependencies are resolved and a virtual environment is
-created:
+created, by running:
 
 ```bash
 uv sync
