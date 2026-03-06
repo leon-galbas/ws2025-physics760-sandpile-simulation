@@ -1,0 +1,82 @@
+\documentclass[10pt]{beamer}
+% \documentclass[handout, 10pt]{beamer}
+
+\usepackage{homework}
+
+\usetheme{Madrid}
+\setbeamersize{text margin left=30pt,text margin right=20pt}
+\graphicspath{{../../figures/}}
+
+\usepackage[backend=biber,style=authoryear-comp]{biblatex}
+\addbibresource{references.bib}
+% Beamer needs this to show footnotes properly
+\setbeamertemplate{footnote}{%
+  \parindent 0em\noindent
+  \raggedright
+  \insertfootnotemark\insertfootnotetext\par
+}
+% Change item symbols for bibliography
+\setbeamertemplate{bibliography item}[triangle]
+\setbeamertemplate{itemize item}[triangle]
+
+% Title Page
+\title[Simulating Sandpiles]{Simulating Sandpiles}
+\subtitle{Computational Physics (physics760)}
+\author{Konrad Beck, Leon Galbas}
+\date{09.03.2026}
+\institute[Universität Bonn]{Rheinische Friedrich-Wilhelms-Universität Bonn}
+
+
+\begin{document}
+\frame{\titlepage}
+
+% Table of Contents
+\begin{frame}{Outline}
+    \tableofcontents
+\end{frame}
+% Current section
+\AtBeginSection[ ]
+{
+\begin{frame}{Outline}
+    \tableofcontents[currentsection]
+\end{frame}
+}
+\AtBeginSubsection[]
+{
+  \begin{frame}{Outline}
+    \tableofcontents[currentsection,currentsubsection]
+  \end{frame}
+}
+
+% Start of actual presentation
+
+\section{Motivation}
+\input{sections/01_motivation}
+
+
+\section{Sandpiles}
+\input{sections/02_sandpiles}
+
+
+\section{Implementation}
+\input{sections/03_implementation}
+
+
+\section{Results}
+\input{sections/04_results}
+
+
+% Sources
+\section*{Sources}
+\begin{frame}{Sources: Software}
+    The simulations and analyses described in this talk were implemented in Python, using the PyTorch and NumPy packages for efficient handling of multi dimensional data. Visualization was done in Matplotlib. The source code used to generate all numerical results is publicly available on GitHub at:
+
+    \href{https://github.com/leon-galbas/ws2025-physics760-sandpile-simulation}{\textcolor{blue}{https://github.com/leon-galbas/ws2025-physics760-sandpile-simulation}}.
+\end{frame}
+\begin{frame}{Sources: Literature}
+    \begin{tiny}
+        \printbibliography
+    \end{tiny}
+\end{frame}
+
+\end{document}
