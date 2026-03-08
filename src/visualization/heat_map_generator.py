@@ -18,16 +18,20 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S",
 )
 
-def capture(boundary_condition, perturbation,N, time_steps, r= None, burn_in= False): 
+def capture(boundary_condition, perturbation,N, time_steps, r= None, burn_in= False, prep=None): 
     model = CaptureSandpileModel(
             N,
             time_steps,
             boundary_condition=boundary_condition,
             perturbation=perturbation,
-            z_init="max"
+            z_init=0
         )
+    
     if burn_in: 
         model.burn_in(epsilon=0.00397)
+    if prep is not None: 
+        for p in prep: 
+            model.step(r=p,capture=False)
     while model._micro_time< model.capture_time: 
         model.step(r=r)
 
@@ -65,9 +69,9 @@ def animate_heatmaps(model, filename):
     T = model.capture_time
     N = model.N
     
-    #ax.set_xticks(range(N), labels=range(N),
-    #                    rotation=45, ha="right", rotation_mode="anchor")
-    #ax.set_yticks(range(len(range(N))), labels=range(N))
+    ax.set_xticks(range(N), labels=range(N),
+                        rotation=45, ha="right", rotation_mode="anchor")
+    ax.set_yticks(range(len(range(N))), labels=range(N))
     value_texts = []
 
     def draw_values(frame):
@@ -87,21 +91,24 @@ def animate_heatmaps(model, filename):
                 )
                 value_texts.append(txt)
 
-    #draw_values(0)
+    draw_values(0)
     def update(frame):
         
         im.set_data(time_series[frame])
         ax.set_title(f"t = {frame}")
-        #draw_values(frame)
+        draw_values(frame)
         return [im]
     
     ani = FuncAnimation(
         fig,
         update,
         frames=T,
-        interval=17,   # milliseconds between frames
+        interval=170 ,   # milliseconds between frames
         blit=True
     )
-    ani.save(filename, writer="pillow", fps=120)
-model = capture("open", "nonconservative", 25, 1000, burn_in=True)
-animate_heatmaps(model, "figures/heatmaps/test.gif")
+    ani.save(filename, writer="pillow", fps=10)
+
+p=(3,3)
+prep= [p,p,p,(4,3),(4,3),(4,3),(3,4),(3,4)]
+model = capture("open", "nonconservative", 5, 5, burn_in=False, prep=prep, r=p)
+animate_heatmaps(model, "figures/heatmaps/relaxation_example.gif")

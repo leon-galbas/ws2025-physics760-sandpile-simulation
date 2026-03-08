@@ -160,7 +160,7 @@ class CaptureSandpileModel:
 
 
     # DEPRECATED -> USE BURN IN AND MEASURE
-    def step(self, steps: int = 1, r= None):
+    def step(self, steps: int = 1, r= None, capture=True):
         """Performs time steps of the models macroscopic temporary evolution.
 
         One macroscopic time step corresponds to one full loop of Algorithm 1 in the
@@ -182,8 +182,8 @@ class CaptureSandpileModel:
         # do macroscopic time steps
         logging.info(f"Performing {steps} time steps of the model...")
         for i in tqdm(range(steps)):
-            s[i], t[i], l[i] = self.relax()  # noqa: E741
-            self.perturb(r)
+            s[i], t[i], l[i] = self.relax(capture=capture)  # noqa: E741
+            self.perturb(r, capture=capture)
             z_mean[i] = self.z_mean
             self._z_mean_hist.append(z_mean[i])
         logging.info("Done!")
