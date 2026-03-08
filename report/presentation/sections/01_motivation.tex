@@ -1,0 +1,57 @@
+\begin{frame}{Introduction}
+
+    % TODO: Side by side comparison: Plot of Ising model power law and plot of Gutenberg-Richter-Law
+
+    \begin{itemize}
+        \item Question: What is the difference between these two?
+    \end{itemize}
+
+\end{frame}
+
+
+
+\begin{frame}{Self-organized criticality}
+
+    \begin{itemize}
+        \item Answer: The Ising model needs a fine-tuned parameter (e.g. temperature) to reach criticality, while earthquakes exhibit this behavior in their own. \\
+            $\implies$ Self-Organized Criticality (SOC) \pause
+        \item SOC naturally explains the widespread appearance of fractal structures and inverse-frequency noise in nature \pause
+        \item Scale invariance: events of all sizes happen, no single "characteristic" scale
+            $\implies$ Probability distributions of events follow power laws (Pareto distribution)
+    \end{itemize}
+
+\end{frame}
+
+
+
+\begin{frame}{Power laws}
+
+    % TODO: Image of one or two power laws, e.g. solar flares (see https://arxiv.org/pdf/2212.02678)
+
+\end{frame}
+
+
+
+\begin{frame}{Why sandpiles?}
+
+    \begin{itemize}
+        \item The Bak-Tang-Wiesenfeld (BTW) sandpile model is a very simple model to study SOC (\cite{bak1987self})
+        \item Analogy: Slowly dropping sand onto a table causes regular avalanches of various sizes
+    \end{itemize}
+
+    % TODO: include example picture of sandpile
+
+\end{frame}
+
+
+
+\begin{frame}{Goals of our project}
+
+    \begin{itemize}
+        \item Simulate a BTW sandpile cellular automaton in $d=2,3,4$ dimensions
+        \item Show that the system exhibits self-organized criticality
+        \item Confirm the emergence of power laws and compute the scaling exponents
+        \item Compare the results for different hyperparameters and dimensions
+    \end{itemize}
+
+\end{frame}
