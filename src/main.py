@@ -31,7 +31,8 @@ def main():
         run_simulation(**config, z_init="max")
 
     # plot scaling exponents
-    run_scaling_plots()
+    run_scaling_plots(plot_boundaries=True)
+    run_scaling_plots(plot_boundaries=False)
 
 
 if __name__ == "__main__":
