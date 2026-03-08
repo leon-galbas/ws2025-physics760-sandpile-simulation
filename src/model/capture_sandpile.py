@@ -43,6 +43,7 @@ class CaptureSandpileModel:
     _z_mean_hist: list[float]
     _sandpile_time_series: torch.Tensor
     _micro_time: int
+
     # ---------- CONSTRUCTOR ----------
 
     def __init__(
@@ -83,6 +84,7 @@ class CaptureSandpileModel:
         self.capture_time= capture_time
         self._N = N
         self._d = 2
+        self.macro_times= np.empty(capture_time,dtype=np.int64)
         if z_c is not None:
             self._z_c = z_c
         else:
@@ -261,7 +263,9 @@ class CaptureSandpileModel:
             #Capture time step
             if self._micro_time < self.capture_time and capture: 
                 self.sandpile_time_series[self._micro_time]= self.z 
+                self.macro_times[self._micro_time]= self._macro_time
                 self._micro_time+=1 
+                
             else: break
         # calculate spatial linear size l auf the avalanche
         if total_dissipation_s > 0 and self._r_0 is not None:
@@ -340,7 +344,9 @@ class CaptureSandpileModel:
         #Capture time step
         if self._micro_time == 0 and capture: 
             self.sandpile_time_series[self._micro_time]= self.z 
+            self.macro_times[self._micro_time]= self._macro_time
             self._micro_time+=1 
+            
         """Performs a perturbation of z as described in the reference."""
         # choose random lattice position
         if r is None:
@@ -365,7 +371,9 @@ class CaptureSandpileModel:
         #Capture time step
         if self._micro_time < self.capture_time and capture: 
             self.sandpile_time_series[self._micro_time]= self.z 
+            self.macro_times[self._micro_time]= self._macro_time
             self._micro_time+=1 
+            
     def save(self, filename=None):
         """Save the model to a file
 
