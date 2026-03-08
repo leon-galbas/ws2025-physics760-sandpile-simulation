@@ -1,0 +1,114 @@
+\begin{frame}{The BTW sandpile}
+    \textbf{Definition:}
+
+    \begin{itemize}
+        \item A $d$-dimensional hypercubic grid $R\subset\bZ^d$ of linear size $N$.
+        \item A function $z(r):\; \bZ^d \to \bZ$. (The local \enquote{slope} or \enquote{energy}.)
+        \item A threshold $z_c$, s.t. for $z(r)>z_c$ the system is unstable.
+        \item A relaxation function $z_\tau(r)\mapsto z_{\tau+1}(r)$.
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}{The relaxation function}
+    For all $r\in R$ with $z_\tau(r) > z_c$, i.e. at every unstable lattice site:
+    \begin{align*}
+        z_\tau(r) &\to z_\tau(r) - 2d, \\
+        z_\tau(r\pm e_i) &\to z_\tau(r\pm e_i) + 1 \qq{for} i=1,\ldots,d.
+    \end{align*}
+    Imagine sandpile \enquote{toppling} onto its neighbors.
+\end{frame}
+
+
+\begin{frame}{An avalanche}
+
+    % TODO: Insert animation of sandpile that starts of in a very unstable state and topples toward stable state (without further perturbation)
+
+\end{frame}
+
+
+\begin{frame}{Boundary conditions}
+
+    \textbf{Open:}
+    \begin{align*}
+        z_\tau(r) &\to z_\tau(r) - 2d + (\text{number of }i\text{ with }r_i=N), \\
+        z_\tau(r+e_i) &\to z_\tau(r+e_i) + 1 \qq{if} r_i\neq N, \\
+        z_\tau(r-e_i) &\to z_\tau(r-e_i) + 1 \qq{for} i=1,\ldots,d, \\
+        \text{and} z_\tau(r) &= 0 \qq{if} r_i=1 \text{ for any i}.
+    \end{align*} \pause
+
+    \textbf{Closed:}
+    \begin{equation*}
+        z_\tau(r) = 0 \qq{if} r_i=1\text{ or } r_i=N \text{ for any i}.
+    \end{equation*}
+
+\end{frame}
+
+
+\begin{frame}{Driving the system}
+    \textbf{Conservative perturbation:} Keeps the total energy constant.
+    \begin{align*}
+        z(r_0) &\to z(r_0) + d, \\
+        z(r_0-e_i) &\to z(r_0-e_i) - 1 \qq{for} i=1,\ldots,d
+    \end{align*}
+    Local rearrangement of the sandpile. \pause
+
+    \textbf{Nonconservative perturbation:} Locally increases the energy.
+    \begin{equation*}
+        z(r_0) \to z(r_0) + 1
+    \end{equation*}
+    Randomly drop a grain of sand.
+\end{frame}
+
+
+\begin{frame}{Driving the system}
+
+    % TODO: Timelapse animation of empty system being driven until some avalanches happen.
+
+\end{frame}
+
+
+\begin{frame}{Reaching criticality}
+
+    \begin{itemize}
+        \item Perturbation: Introduces energy to the system
+        \item Relaxation: Dissipates energy from the system at the boundaries
+        \item In the stationary state: \begin{equation*}
+            \expval{z} \to \overline{\expval{z}} = \lim_{T\to\infty}\frac{1}{T}\int_{0}^{T}\expval{z}(\tau)\dd{\tau}.
+        \end{equation*}
+    \end{itemize}
+
+    In the critical state, the total (spatial average) energy fluctuates around a temporal average energy.
+
+\end{frame}
+
+
+\begin{frame}{The critical state}
+
+    % TODO: Animation of a system already in stationary state, exhibiting avalanches of various sizes
+
+\end{frame}
+
+
+\begin{frame}{What do we measure?}
+
+    \textbf{Avalanche variables:}
+    \begin{itemize}
+        \item Avalanche lifetime $t$.
+        \item Total size $s$. \\ (Cumulative sum of all toppling events.)
+        \item Spatial linear size $l$. \\ (Maximum linear extend in any dimension.)
+    \end{itemize}
+
+\end{frame}
+
+
+\begin{frame}{What do we expect?}
+
+    \textbf{Power laws:}
+    \begin{align*}
+        P(T=t) &\propto t^{1-\alpha}, \\
+        P(S=s) &\propto s^{1-\tau}, \\
+        P(L=l) &\propto l^{1-\lambda}.
+    \end{align*}
+
+\end{frame}

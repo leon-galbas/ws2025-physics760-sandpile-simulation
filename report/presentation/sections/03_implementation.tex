@@ -1,0 +1,46 @@
+\begin{frame}{The transient phase}
+
+    % Question (spoken): How do we know whether a system has reached a stationary state
+    \pause
+    % TODO: Insert burn-in-plot
+
+\end{frame}
+
+
+\begin{frame}{The transient phase}
+    \begin{enumerate}
+        \item Initialize the sandpile.
+        \item Define a threshold $\eps>0$.
+        \item Track $\expval{z}$ every $\num{1000}$ steps while continually perturbing and relaxing the sandpile.
+        \item Do a linear fit through the last $\num{50}$ values.
+        \item Stop, if the slope is smaller than $\eps$.
+    \end{enumerate}
+\end{frame}
+
+
+\begin{frame}{The linear scaling region}
+
+    % TODO: Insert one exemplary plot of a measured distribution without boundary lines
+
+\end{frame}
+
+
+\begin{frame}{Determining the scaling region}
+    \begin{enumerate}
+        \item Apply linear regression on rolling window of fixed size.
+        \item Determine the slope $m_i$ and uncertainty $\Delta m_i$ for each window.
+        \item Calculate differences\begin{equation*}
+            d_i = \abs{m_i-m_{i+1}}, \qquad
+            \Delta d_i = \sqrt{(\Delta m_i)^2+(\Delta m_{i+1})^2}.
+        \end{equation*}
+        \item Classify as stable, if $d_i < k\cdot\Delta d_i$, and if both fits satisfy $r_i^2 \geq r_{\mathrm{thresh}}$.
+        \item Set upper and lower bounds of scaling region.
+    \end{enumerate}
+\end{frame}
+
+
+\begin{frame}{Determining the scaling region}
+
+    % TODO: Insert same plot as above, but with scaling boundary lines
+
+\end{frame}
