@@ -62,9 +62,26 @@
 
 
 \begin{frame}{Driving the system}
+    \begin{algorithm}[H]
+        \caption{Time evolution of a sandpile with a slow driving perturbation (\cite{christensen1991dynamical}).}
+        \KwIn{Initial sandpile state $z_0$, critical value $z_c$, number of macroscopic time steps $N_\mathrm{steps}$}
+        \KwOut{Final state after $N_\mathrm{steps}$ steps}
+
+        \For{$i=1$ \KwTo $N_\mathrm{steps}$}{
+            \While{$\exists r\in R:\, z_\tau(r) > z_c$}{
+                Apply relaxation $z_\tau(r) \to z_{\tau+1}(r)$ \;
+            }
+            Choose $r_0\in R$ randomly \;
+            Apply perturbation at $r_0$ \;
+        }
+    \end{algorithm}
+\end{frame}
+
+
+\begin{frame}{Driving the system}
 
     % TODO: Timelapse animation of empty system being driven until some avalanches happen.
-    
+
     \centering
     \animategraphics[width=\textwidth]{15}{../../figures/heatmaps/burn_in/frame-}{0}{499}
 \end{frame}
@@ -115,8 +132,8 @@
         P(S=s) &\propto s^{1-\tau}, \\
         P(L=l) &\propto l^{1-\lambda}.
     \end{align*}
-    \pause 
+    \pause
     \begin{equation*}
-        \log P(T=t) \propto (1-\alpha) \log t 
+        \log P(T=t) \propto (1-\alpha) \log t
     \end{equation*}
 \end{frame}
