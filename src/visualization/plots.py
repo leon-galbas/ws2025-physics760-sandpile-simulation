@@ -22,13 +22,13 @@ from src.visualization.mappings import (
 mpl.rcParams.update(read_plot_config("matplotlib_setup"))
 
 
-def main():
+def main(plot_boundaries: bool = True):
     """Generate all plots and tables used in the paper."""
-    data = generate_plots()
+    data = generate_plots(plot_boundaries)
     generate_tables(data)
 
 
-def generate_plots() -> pd.DataFrame:
+def generate_plots(plot_boundaries: bool = True) -> pd.DataFrame:
     exponents_latex = []
 
     # create plots
@@ -53,6 +53,7 @@ def generate_plots() -> pd.DataFrame:
                 df_raw,
                 name,
                 **get_scaling_window_args(model_id),
+                plot_boundaries=plot_boundaries,
             )
             exponents_latex.append(exponents)
             logging.info("Done!")
@@ -129,6 +130,7 @@ def plot_scaling_exponents(
     deviation_factor,
     do_errors=False,
     cond_bounds={},
+    plot_boundaries=True,
 ):
     # initialize latex ready exponents dict
     if model_name not in model_name_to_id.keys():
@@ -166,38 +168,42 @@ def plot_scaling_exponents(
                 x, y - yerr, y + yerr, color=band_color, alpha=0.15, linewidth=0
             )
 
-        # plot fit
-        lin_regress_x = np.linspace(np.min(x), np.max(x), 10)
-        if key in ["tau", "alpha", "lambda"]:
-            lin_regress_y = lin_regress_x * (1 - fit["exponent"]) + fit["intercept"]
-            fitlabel = (
-                "WLS fit\n"
-                + r"$m=$"
-                + f"{(1 - fit['exponent']):.4f}\n"
-                + r"$\Delta m=$"
-                + f"{fit['std_err']:.4f}"
-            )
-        else:
-            lin_regress_y = lin_regress_x * fit["exponent"] + fit["intercept"]
-            fitlabel = (
-                "WLS fit\n"
-                + r"$m=$"
-                + f"{fit['exponent']:.4f}\n"
-                + r"$\Delta m=$"
-                + f"{fit['std_err']:.4f}"
-            )
-        plt.plot(lin_regress_x, lin_regress_y, label=fitlabel)
+        if plot_boundaries:
+            # plot fit
+            lin_regress_x = np.linspace(np.min(x), np.max(x), 10)
+            if key in ["tau", "alpha", "lambda"]:
+                lin_regress_y = lin_regress_x * (1 - fit["exponent"]) + fit["intercept"]
+                fitlabel = (
+                    "WLS fit\n"
+                    + r"$m=$"
+                    + f"{(1 - fit['exponent']):.4f}\n"
+                    + r"$\Delta m=$"
+                    + f"{fit['std_err']:.4f}"
+                )
+            else:
+                lin_regress_y = lin_regress_x * fit["exponent"] + fit["intercept"]
+                fitlabel = (
+                    "WLS fit\n"
+                    + r"$m=$"
+                    + f"{fit['exponent']:.4f}\n"
+                    + r"$\Delta m=$"
+                    + f"{fit['std_err']:.4f}"
+                )
+            plt.plot(lin_regress_x, lin_regress_y, label=fitlabel)
 
-        # plot scaling region
-        plt.axvline(
-            x[fit["lower"]],
-            linestyle=":",
-            label="fitting window",
-        )
-        plt.axvline(x[fit["upper"]], linestyle=":")
+            # plot scaling region
+            plt.axvline(
+                x[fit["lower"]],
+                linestyle=":",
+                label="fitting window",
+            )
+            plt.axvline(x[fit["upper"]], linestyle=":")
 
         # plot layout
-        plot_path = path.join(plot_dir, f"{model_name}_{key}.pdf")
+        if plot_boundaries:
+            plot_path = path.join(plot_dir, f"{model_name}_{key}.pdf")
+        else:
+            plot_path = path.join(plot_dir, f"{model_name}_{key}_no-boundaries.pdf")
         plt.legend()
         plt.xlabel(x_label_conv_table[key])
         plt.ylabel(label_conv_table[key])

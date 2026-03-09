@@ -1,6 +1,22 @@
 \begin{frame}{Introduction}
 
-    % TODO: Side by side comparison: Plot of Ising model power law and plot of Gutenberg-Richter-Law
+    \begin{figure}
+        \centering
+
+        \begin{subfigure}{0.48\textwidth}
+            \centering
+            \includegraphics[width=\linewidth,height=0.55\textheight,keepaspectratio]{ising_example_clustersize.png}
+            \caption{Log-log plot of the cluster-size distribution $n_I(s,V)$ versus $s$ for an Ising model in the Ising sector \cite{fang2021percolation}.}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}{0.48\textwidth}
+            \centering
+            \includegraphics[width=\linewidth,height=0.55\textheight,keepaspectratio]{earthquake_power_law}
+            \caption{Earthquake magnitude distribution in Southern California showing a power-law behavior over 6 decades \cite{bak2002unified}.}
+        \end{subfigure}
+
+        \caption{Two different systems in a critical state showing behavior governed by power laws.}
+    \end{figure}
 
     Question: What is the difference between these two?
 
@@ -22,11 +38,11 @@
 
 
 
-\begin{frame}{Power laws}
+%\begin{frame}{Power laws}
 
     % TODO: Image of one or two power laws, e.g. solar flares (see https://arxiv.org/pdf/2212.02678)
 
-\end{frame}
+%\end{frame}
 
 
 
@@ -37,7 +53,11 @@
         \item Analogy: Slowly dropping sand onto a table causes regular avalanches of various sizes
     \end{itemize}
 
-    % TODO: include example picture of sandpile
+    \begin{figure}
+        \centering
+        \includegraphics[width=\linewidth,height=0.55\textheight,keepaspectratio]{sandpile_example}
+        \caption{Example state of a two dimensional BTW sandpile model.}
+    \end{figure}
 
 \end{frame}
 
