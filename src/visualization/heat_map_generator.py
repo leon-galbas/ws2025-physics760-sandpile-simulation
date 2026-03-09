@@ -137,8 +137,8 @@ def animate_heatmaps(model, filename, single_Frames=False, annotation= True, ind
 
 
 p=(3,3)
-prep= [p,]* 36#[p,p,p,(4,3),(4,3),(4,3),(3,4),(3,4)]
-model = capture("open", "nonconservative", 5, 8, burn_in=False, prep=prep, r=p)
+prep= [p,]* 35#[p,p,p,(4,3),(4,3),(4,3),(3,4),(3,4)]
+model = capture("open", "nonconservative", 5, 9, burn_in=False, prep=prep, r=p)
 
 animate_heatmaps(model, "figures/heatmaps/relaxation_example", single_Frames=True)
 
