@@ -63,7 +63,7 @@ def animate_heatmaps(model, filename, single_Frames=False, annotation= True, ind
     fig, ax = plt.subplots()
     im = ax.imshow(
         time_series[0],
-        cmap="copper",
+        cmap="turbo",
         vmin=time_series.min(),
         vmax=time_series.max(),
         animated= True)
