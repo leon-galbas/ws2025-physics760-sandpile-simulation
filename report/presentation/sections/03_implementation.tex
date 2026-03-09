@@ -69,3 +69,19 @@
     \end{figure}
 
 \end{frame}
+
+\begin{frame}{Error estimation of scaling exponents}
+    \pause 
+    \begin{enumerate}
+        \item compute upper and lower bounds of scaling region
+        \item vary the boundaries by $\pm 3$
+        \item compute the slope of every valid pair of boundaries
+        \item compute standard deviation  $\sigma_\f{sys}$ of all slopes
+        \item combine with linear fit error $\sigma_\f{stat}$
+    \end{enumerate}
+    \pause 
+
+    \begin{equation*}
+    \sigma_\f{tot}=\sqrt{\sigma_\f{stat}^{2}+\sigma_\f{sys}^{2}}
+    \end{equation*}
+\end{frame}

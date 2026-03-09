@@ -1,0 +1,74 @@
+\begin{frame}{What we measured}
+    \begin{table}[ht!]
+  \centering
+  \begin{tabular}{lccccc}
+    \hline
+    config & $d$ & $N$ & boundary condition & perturbation & $n$ \\
+    \hline
+    A & 2 & 40 & open   & nonconservative & $10^7$ \\
+    B & 2 & 40 & open   & conservative    & $10^7$ \\
+    C & 2 & 40 & closed & nonconservative & $10^7$ \\
+    D & 3 & 20 & open   & nonconservative & $10^7$ \\
+    E & 3 & 20 & open   & conservative    & $10^7$ \\
+    F & 3 & 20 & closed & nonconservative & $10^7$ \\
+    G & 4 & 20 & open   & nonconservative & $10^6$ \\
+    H & 4 & 20 & open   & conservative    & $10^6$ \\
+    I & 4 & 20 & closed & nonconservative & $10^6$ \\
+    \hline
+  \end{tabular}
+  \caption{Simulated model configurations and measurement counts used in this work.}
+  \label{tab:model_configurations}
+\end{table}
+\end{frame}
+
+\begin{frame}{Did we observe power laws ?}
+    \pause
+    \begin{figure}
+        \centering
+        \includegraphics[width=\linewidth,height=0.55\textheight,keepaspectratio]{../../figures/loglog_plots/N40d2_open_conservative_lambda}
+        \caption{Measured probability distribution of $l$ for a sandpile of dimension $N=40,\,d=2$ with open boundaries and conservative perturbation.}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Did we observe power laws ?}
+
+    \begin{figure}
+        \centering
+        \includegraphics[width=\linewidth,height=0.55\textheight,keepaspectratio]{../../figures/loglog_plots/N40d2_open_conservative_tau}
+        \caption{Measured probability distribution of $s$ for a sandpile of dimension $N=40,\,d=2$ with open boundaries and conservative perturbation.}
+    \end{figure}
+\end{frame}
+
+
+\begin{frame}{Did we observe power laws ?}
+ 
+    \begin{figure}
+        \centering
+        \includegraphics[width=\linewidth,height=0.55\textheight,keepaspectratio]{../../figures/loglog_plots/N40d2_open_conservative_alpha}
+        \caption{Measured probability distribution of $t$ for a sandpile of dimension $N=40,\,d=2$ with open boundaries and conservative perturbation.}
+    \end{figure}
+\end{frame}
+
+
+
+\begin{frame}{Resulting exponentes}
+    \begin{table}[!ht]
+    \centering
+    \input{../../figures/tables/scaling_exp_open_nonconservative.tex}
+    \caption{Scaling exponents of the probability density functions for the open-boundary, nonconservative sandpile configurations (A, D, G). The exponents $\alpha$, $\tau$, and $\lambda$ are obtained from weighted linear least-squares fits on double-logarithmic PDF plots in the selected scaling window; The errors were determined by the aforementioned procedure.}
+    \label{tab:scaling_exp_open_nonconservative}
+    \end{table}
+\end{frame}
+
+\begin{frame}{Comparing the exponentes to literature}
+    \begin{table}[!ht]
+    \centering
+    \input{../../figures/tables/scaling_exp_open_nonconservative.tex}
+    \end{table}
+    \begin{figure}
+        \centering
+        \includegraphics[width=\linewidth,height=0.55\textheight,keepaspectratio]{values_from_paper}
+        \caption*{\cite{christensen1991dynamical}}
+    \end{figure}
+\end{frame} 
+
