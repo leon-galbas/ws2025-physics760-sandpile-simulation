@@ -22,7 +22,7 @@
 
 \begin{frame}{An avalanche}
     \centering
-    \animategraphics[loop,width=\textwidth]{1}{../../figures/heatmaps/relaxation_example/frame-}{0}{7}
+    \animategraphics[width=\textwidth]{1}{../../figures/heatmaps/relaxation_example/frame-}{0}{8}
     % TODO: Insert animation of sandpile that starts of in a very unstable state and topples toward stable state (without further perturbation)
 \end{frame}
 
@@ -115,5 +115,8 @@
         P(S=s) &\propto s^{1-\tau}, \\
         P(L=l) &\propto l^{1-\lambda}.
     \end{align*}
-
+    \pause 
+    \begin{equation*}
+        \log P(T=t) \propto (1-\alpha) \log t 
+    \end{equation*}
 \end{frame}
